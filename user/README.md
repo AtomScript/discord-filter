@@ -52,6 +52,9 @@
 </ul></li>
 </ul>
 
+## For ORDER BY clause
+- separator
+- count
 
 ### Using query
 ```javascript
@@ -91,4 +94,9 @@ SELECT username, id FROM * WHERE nickname.startsWith="$"
 ```javascript
 SELECT username, id, createdDate FROM * WHERE joined.days<=10
 // Filters users who have logged on to the server less than 10 days ago.
+```
+```javascript
+SELECT tag, id FROM * WHERE joined.days<=10 ORDER BY separator=" | " AND count=1
+// Output: $Herous_#0264 | 618030185710184100
+// Note: as i set the count attribute, it returned me only 1 user, instead of 3.
 ```
