@@ -9,6 +9,7 @@
 - createdDate
 - joinedDate
 - isBot
+- discriminator
 
 ### For WHERE clause
 <ul>
@@ -27,7 +28,7 @@
 <li>startsWith</li>
 <li>endsWith</li>
 </ul></li>
-<li>tag<ul>
+<li>discriminator<ul>
 <li>includes</li>
 <li>startsWith</li>
 <li>endsWith</li>
