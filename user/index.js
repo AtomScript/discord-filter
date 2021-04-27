@@ -19,7 +19,7 @@ function rejoin (array, separator){
 		newArr.push(item.join(separator));
 	});
 	
-	return newArr.join("\n");
+	return newArr;
 };
 
 module.exports.run = async (message, msg) => {
@@ -75,8 +75,8 @@ module.exports.run = async (message, msg) => {
 		  	 
 		  	}else if(items.type === "OrderBy"){
 		  		let item = items.items;
-		  		
-		  
+		  		if(typeof item !== "object") return;
+		      
 		  		for(let arg in item){
 		  			if(arg === "separator"){
 		  				separator = item[arg];
@@ -95,12 +95,15 @@ module.exports.run = async (message, msg) => {
 	}else{
 		if(data.target === "*"){
 			let separator = "|";
+			let count = null;
 			let membersFiltered = [];
 			let members = await guild.members.fetch();
 		  let where = data.params.filter(it =>{
 		  		if(it.type === "where")
 		  		return it.items;
 		  		})[0];
+		if(typeof where !== "object") where = null;
+		      
 		  
 		  if(where){
 		  members = members.filter(member =>{
@@ -465,11 +468,18 @@ module.exports.run = async (message, msg) => {
 		  	 
 		  	}else if(items.type === "OrderBy"){
 		  		let item = items.items;
-		  		
+		  		if(typeof item !== "object") return;
+		      
 		  
 		  		for(let arg in item){
 		  			if(arg === "separator"){
 		  				separator = item[arg];
+		  			}
+		  			else
+            if(arg === "count"){
+            	if(isNaN(item[arg])) return;
+            	
+		  				count = Number(item[arg]);
 		  			}
 		  		}
 		  	}
@@ -481,8 +491,11 @@ module.exports.run = async (message, msg) => {
 			
 			let compress = rejoin(membersFiltered, separator);
 			
+			if(count)
+			compress = compress.slice(0, count);
+	   
 			if(membersFiltered.length > 0)
-		  message.channel.send(compress);
+		  message.channel.send(compress.join("\n"));
 			else
       message.channel.send("Please specify.");
 			
@@ -532,7 +545,8 @@ module.exports.run = async (message, msg) => {
 		  	 
 		  	}else if(items.type === "OrderBy"){
 		  		let item = items.items;
-		  		
+		  		if(typeof item !== "object") return;
+		      
 		  
 		  		for(let arg in item){
 		  			if(arg === "separator"){
