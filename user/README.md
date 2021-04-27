@@ -54,7 +54,7 @@
 
 ### Using query
 ```javascript
-SELECT username, id FROM @$Herous_0264
+SELECT username, id FROM @$Herous_#0264
 //   OR
 SELECT username, id FROM $Herous_
 //   OR
