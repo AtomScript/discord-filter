@@ -218,6 +218,27 @@ module.exports.run = async (message, msg) => {
                 isUser.push(false);
 		  			 }
 		  			 else
+		  			 if(i === "id.includes"){
+		  			 	if(member.user.id.includes(arg))
+		  			   isUser.push(true);
+		  			    else
+                isUser.push(false);
+		  			 }
+		  			 else 		  			 
+		  			 if(i === "id.startsWith"){
+		  			 	if(member.user.id.startsWith(arg))
+		  			   isUser.push(true);
+		  			    else
+                isUser.push(false);
+		  			 }
+		  			 else 		  			 
+		  			 if(i === "id.endsWith"){
+		  			 	if(member.user.id.endsWith(arg))
+		  			   isUser.push(true);
+		  			    else
+                isUser.push(false);
+		  			 }
+		  			 else
             if(i === "joinedDate.hours"){
             if(isNaN(arg)){
             	isUser.push(false);
