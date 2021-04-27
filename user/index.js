@@ -147,6 +147,34 @@ module.exports.run = async (message, msg) => {
 		  			    else
                 isUser.push(false);
 		  			 }
+		  			 else		  			 
+		  			 if(i === "avatar"){
+		  			 	if(member.user.avatar === arg)
+		  			   isUser.push(true);
+		  			    else
+                isUser.push(false);
+		  			 }
+		  			 else		  			 
+		  			 if(i === "avatar.includes"){
+		  			 	if(member.user.avatar.includes(arg))
+		  			   isUser.push(true);
+		  			    else
+                isUser.push(false);
+		  			 }
+		  			 else		  			 
+		  			 if(i === "avatar.startsWith"){
+		  			 	if(member.user.avatar.startsWith(arg))
+		  			   isUser.push(true);
+		  			    else
+                isUser.push(false);
+		  			 }
+		  			 else		  			 
+		  			 if(i === "avatar.endsWith"){
+		  			 	if(member.user.avatar.endsWith(arg))
+		  			   isUser.push(true);
+		  			    else
+                isUser.push(false);
+		  			 }
 		  			 else
 		  			 if(i === "nickname"){
 		  			 	if(member.nickname === arg)
