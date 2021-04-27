@@ -44,6 +44,7 @@
 <li>months</li>
 </ul></li>
 <li>isBot</li>
+<li>tag</li>
 <li>avatar<ul>
 <li>includes</li>
 <li>startsWith</li>
