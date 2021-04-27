@@ -3,11 +3,52 @@
 ### Attributes
 - username
 - nickname
+- tag
 - id
 - avatar
 - createdDate
 - joinedDate
 - isBot
+
+### For WHERE clause
+<ul>
+<li>username<ul>
+<li>includes</li>
+<li>startsWith</li>
+<li>endsWith</li>
+</ul></li>
+<li>nickname<ul>
+<li>includes</li>
+<li>startsWith</li>
+<li>endsWith</li>
+</ul></li>
+<li>id<ul>
+<li>includes</li>
+<li>startsWith</li>
+<li>endsWith</li>
+</ul></li>
+<li>tag<ul>
+<li>includes</li>
+<li>startsWith</li>
+<li>endsWith</li>
+</ul></li>
+<li>createdDate<ul>
+<li>hours</li>
+<li>days</li>
+<li>months</li>
+</ul></li>
+<li>joinedDate<ul>
+<li>hours</li>
+<li>days</li>
+<li>months</li>
+</ul></li>
+<li>isBot</li>
+<li>avatar<ul>
+<li>includes</li>
+<li>startsWith</li>
+<li>endsWith</li>
+</ul></li>
+</ul>
 
 
 ### Using query
@@ -40,4 +81,12 @@ SELECT username, id, createdDate FROM * WHERE createdDate.days>=10
 ```javascript
 SELECT username, id, createdDate FROM * WHERE createdDate.days=10
 // Filters users who have a creation date equal to 10 days.
+```
+```javascript
+SELECT username, id FROM * WHERE nickname.startsWith="$"
+// Filters users who have a nickname that starts with $.
+```
+```javascript
+SELECT username, id, createdDate FROM * WHERE joined.days<=10
+// Filters users who have logged on to the server less than 10 days ago.
 ```
