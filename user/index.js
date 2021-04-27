@@ -403,6 +403,8 @@ module.exports.run = async (message, msg) => {
 						}
 					});
 				}
+			
+				if(members.size === 0) return message.channel.send("no users were found with these filters.");
 
 				members.forEach(async member => {
 					await new Promise(async resolver => {
