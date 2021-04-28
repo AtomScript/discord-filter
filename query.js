@@ -33,7 +33,7 @@ module.exports.getAttrValue = function(text) {
 				.match(/^("([^"].*)(")(?!.*\b\1\b))/g)[0]
 				.replace(/^"/g, '')
 				.replace(/"$/g, '');
-		else text = text.replace(/(\s)+$/g, '').replace(/^(\s)+/g, '');
+		else text = text.replace(/(\s)$/g, '').replace(/^(\s)/g, '');
 
 	//	console.log("last test: ",text)
 
