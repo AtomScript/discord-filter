@@ -187,12 +187,19 @@ module.exports.getParams = function(text) {
 };
 
 module.exports.getTarget = function(text) {
-	return text
-		.match(/FROM .*?((SET .*)?|( WHERE)?|( ORDER BY)?|( VALUES)?|( GROUP BY)?)$/g)[0]
+	text = text
+		.match(/FROM .*?(( SET .*)?|( WHERE)?|( ORDER BY)?|( VALUES)?|( GROUP BY)?|\s?)$/g);
+		
+		if(text)
+		text = text[0]
 		.replace(/^(FROM)/g, '')
 		.replace(/((WHERE .*)|(SET .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/g, '')
 		.replace(/(\s)+$/g, '')
 		.replace(/^(\s)+/g, '');
+		else
+    text = "";
+		
+		return text;
 };
 
 Array.prototype.remove = function(name) {
