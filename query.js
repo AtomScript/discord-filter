@@ -2,7 +2,7 @@ module.exports.getAttrValue = function(text) {
 	try {
 	//	console.log("First test: ", text);
 		
-		text = text.replace(/((WHERE .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/g, '');
+		text = text.replace(/((WHERE .*)|(SET .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/g, '');
 		
 	//	 console.log("test 1:", text);
 
@@ -140,7 +140,7 @@ module.exports.getOrderBy = function(text) {
 	else text = null;
 	
  if(text !== null)
-	text = text.replace(/((WHERE .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/g, '');
+	text = text.replace(/((WHERE .*)|(SET .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/g, '');
 
 	return text;
 };
@@ -154,7 +154,7 @@ module.exports.getValuesC = function(text) {
 	else text = null;
   
   if(text !== null)
-	text = text.replace(/((WHERE .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/g, '');
+	text = text.replace(/((WHERE .*)|(SET .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/g, '');
 	
 	return text;
 };
@@ -168,7 +168,7 @@ module.exports.getGroupBy = function(text) {
 	else text = null;
   
   if(text !== null)
-	text = text.replace(/((WHERE .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/g, '');
+	text = text.replace(/((WHERE .*)|(SET .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/g, '');
 	
 	return text;
 };
@@ -188,9 +188,9 @@ module.exports.getParams = function(text) {
 
 module.exports.getTarget = function(text) {
 	return text
-		.match(/FROM .*?(( WHERE)?|( ORDER BY)?|( VALUES)?|( GROUP BY)?)$/g)[0]
+		.match(/FROM .*?((SET .*)?|( WHERE)?|( ORDER BY)?|( VALUES)?|( GROUP BY)?)$/g)[0]
 		.replace(/^(FROM)/g, '')
-		.replace(/((WHERE .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/g, '')
+		.replace(/((WHERE .*)|(SET .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/g, '')
 		.replace(/(\s)+$/g, '')
 		.replace(/^(\s)+/g, '');
 };
@@ -219,7 +219,7 @@ const willBeArray = array => {
 };
 
 module.exports.getAttributes = function(text) {
-  text = text.replace(/((WHERE .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/g, '');
+  text = text.replace(/((WHERE .*)|(SET .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/g, '');
   let separator = {
   	all: [],
   	OR: [],
@@ -255,6 +255,20 @@ separators = separators.filter(i => i === "AND"|| i === "OR" || i === "," || i =
 //	console.log("separator: ", separator)
 
 	return {separator: separator, text: text};
+};
+
+module.exports.getSet = function(text) {
+	text = text.split(/(\bSET\b)(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/g);
+
+	text = text.remove('SET');
+
+	if (text.length > 1) text = text[text.length - 1];
+	else text = null;
+  
+  if(text !== null)
+	text = text.replace(/((WHERE .*)|(SET .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/g, '');
+	
+	return text;
 };
 
 module.exports.getAttributesBy = function(text, name) {
@@ -302,6 +316,7 @@ module.exports.parse = function(text) {
 		let ordby = this.getOrderBy(text);
 		let gpby = this.getGroupBy(text);
 		let valuesC = this.getValuesC(text);
+		let getSet = this.getSet(text);
 
 		this.getParams(text).forEach(async param => {
 			await new Promise(async resolve1 => {
@@ -555,6 +570,55 @@ module.exports.parse = function(text) {
 
 
 
+      if (getSet !== null)
+			await new Promise(resolve2 => {
+				summary.params[5] = {
+					type: 'set',
+					items: {}
+				};
+
+				let SubParams = this.getAttributes(getSet);
+				let separator = SubParams.separator;
+						SubParams = SubParams.text;
+						
+				let willbe = willBeArray(SubParams);
+
+			if(separator)
+			summary.params[5].separator = separator;
+						
+
+				SubParams.forEach(async sp => {
+					await new Promise(resolve3 => {
+						let attr = this.getAttr(sp);
+						let value = this.getAttrValue(sp);
+
+						if (value !== null) {
+							if (Array.isArray(summary.params[5]['items'])) {
+								summary.params[5]['items'].push(attr + '=' + value);
+							} else {
+								if (!willbe) summary.params[5]['items'][attr] = value;
+								else {
+									if (!Array.isArray(summary.params[5]['items']))
+										summary.params[5].items = [];
+
+									summary.params[5].items.push(attr + '=' + value);
+								}
+							}
+						} else {
+							if (!Array.isArray(summary.params[5].items))
+								summary.params[5].items = [];
+
+							summary.params[5]['items'].push(attr);
+						}
+
+						resolve3();
+					});
+				});
+
+				resolve2();
+			});
+
+
 
 
 
@@ -664,5 +728,12 @@ module.exports.stringify = function(obj) {
 };
 
 module.exports.isValid = function(text) {
-	return /(.* FROM .*)(( WHERE .*)?|( ORDER BY .*)?|( GROUP BY .*)?)/g.test(text);
+	try{
+		text = this.parse(text);
+		
+		if(text)
+		return true;
+		else
+    return false;
+	}catch{ return false };
 };
