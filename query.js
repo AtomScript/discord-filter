@@ -4,7 +4,7 @@ module.exports.getAttrValue = function(text) {
 		
 		text = text.replace(/((WHERE .*)|(SET .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/g, '');
 		
-	//	 console.log("test 1:", text);
+		 //console.log("test 1:", text);
 
 		if (/(\b(FROM)\b)(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/g.test(text))
 			text = text.replace(/((FROM).*)?(?!.*\b\1\b)/g, '');
@@ -15,18 +15,18 @@ module.exports.getAttrValue = function(text) {
 		if (/(\b(ORDER BY)\b)(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/g.test(text))
 			text = text.replace(/((ORDER BY).*)(?!.*\b\1\b)/g, '');
 
-			//console.log("test 2: ",text);
+		//	console.log("test 2: ",text);
 			
-		if (/(=)(?=(?:(?:[^"]*"){2})*[^"]*$)((?=([^()]*\([^()]*\))*[^()]*$))/g.test(text)){
+		if (/(=)(?=(?:(?:[^"]*"?){2})*[^"]*$)((?=([^()]*\([^()]*\))*[^()]*$))/g.test(text)){
 			idx = text
-				.split(/(=)(?=(?:(?:[^"]*"){2})*[^"]*$)((?=([^()]*\([^()]*\))*[^()]*$))/g);
-			
+				.split(/(=)(?=(?:(?:[^"]*"?){2})*[^"]*$)((?=([^()]*\([^()]*\))*[^()]*$))/g);
+				
 			text = idx[idx.length-1].replace(/(^=)/g, '');
 		}
 		else return null;
 		
 		
-	//	console.log("test 3: ", text)
+	//console.log("test 3: ", text)
 
 		if (/^("([^"]*)")/g.test(text))
 			text = text
@@ -35,7 +35,7 @@ module.exports.getAttrValue = function(text) {
 				.replace(/"$/g, '');
 		else text = text.replace(/(\s)$/g, '').replace(/^(\s)/g, '');
 
-	//	console.log("last test: ",text)
+	//console.log("last test: ",text)
 
 		return text;
 	} catch {
@@ -80,7 +80,7 @@ module.exports.condition = function(separators, conditions) {
 	if(!Array.isArray(conditions)) throw new Error("Conditions must be an array.");
 	if(separators.length > conditions.length) throw new Error("Failed to compare.");
 	
-
+	
 	const onlyAND = containsOnly(separators, "AND");
 	const onlyOR = containsOnly(separators, "OR");
 	
@@ -115,9 +115,9 @@ module.exports.getAttr = function(text) {
 		)[0];
 
 	try {
-		if (/(=(?=(?:(?:[^"]*"){2})*[^"]*$))((?=([^()]*\([^()]*\))*[^()]*$))/g.test(text)) {
+		if (/(=(?=(?:(?:[^"]*"?){2})*[^"]*$))((?=([^()]*\([^()]*\))*[^()]*$))/g.test(text)) {
 			return text
-				.split(/(=(?=(?:(?:[^"]*"){2})*[^"]*$))((?=([^()]*\([^()]*\))*[^()]*$))/g)[0]
+				.split(/(=(?=(?:(?:[^"]*"?){2})*[^"]*$))((?=([^()]*\([^()]*\))*[^()]*$))/g)[0]
 				.replace(/\s/g, '');
 		} else {
 			return text
@@ -174,7 +174,8 @@ module.exports.getGroupBy = function(text) {
 };
 
 module.exports.getParams = function(text) {
-	text = text.split(/(\bWHERE\b)(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/g);
+	try {
+	text = text.split(/(\bWHERE\b)(?!.*\b\1\b)(?=(?:(?:[^"]*"?){2})*[^"]*$)/g);
 
 	text = text.remove('WHERE');
 
@@ -184,6 +185,7 @@ module.exports.getParams = function(text) {
 		.join(' ');
 
 	return text;
+	}catch{return []};
 };
 
 module.exports.getTarget = function(text) {
@@ -226,6 +228,8 @@ const willBeArray = array => {
 };
 
 module.exports.getAttributes = function(text) {
+ //console.log("first test: ", text);
+ 
   text = text.replace(/((WHERE .*)|(SET .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/g, '');
   let separator = {
   	all: [],
@@ -233,7 +237,7 @@ module.exports.getAttributes = function(text) {
   	AND: []
   }
   
- // console.log("test attr 1: ", text)
+  //console.log("test attr 1: ", text)
  
  let separators = text.match(/((AND|,|OR|&&|&|\|\||\|)(?=(?:(?:[^"]*"){2})*[^"]*$))((?=([^()]*\([^()]*\))*[^()]*$))(?!.*\b\1\b)/g) || [];
 
@@ -252,7 +256,7 @@ separators = separators.filter(i => i === "AND"|| i === "OR" || i === "," || i =
  }
  
 
-// console.log("test attr 2: ", text)
+  //console.log("test attr 2: ", text)
 
 	text = text.split(/((AND|,|OR|&&|&|\|\||\|)(?=(?:(?:[^"]*"){2})*[^"]*$))((?=([^()]*\([^()]*\))*[^()]*$))(?!.*\b\1\b)/g);
 
@@ -335,11 +339,15 @@ module.exports.parse = function(text) {
 							items: {},
 							groups: []
 						};
-
+						
+						
 						let SubParams = this.getAttributes(param);
+	
+						
 						let separator = SubParams.separator;
 						SubParams = SubParams.text;
 						
+				
 						if(separator)
 						summary.params[0].separator = separator;
 						
@@ -349,6 +357,8 @@ module.exports.parse = function(text) {
 							await new Promise(resolve3 => {
 								let attr = this.getAttr(sp);
 								let value = this.getAttrValue(sp);
+								
+			
 
 								if (value !== null) {
 									if (Array.isArray(summary.params[0]['items'])) {
