@@ -1,5 +1,8 @@
 # GUIDE
 
+### Requirements
+[![help.png](https://i.postimg.cc/WpSrctYy/help.png)](https://postimg.cc/Sj2jWQhL)
+
 ### Attributes
 - username
 - nickname
