@@ -33,12 +33,16 @@ module.exports.run = async (message, msg) => {
 	let data = await utils.parse(msg);
 	const guild = message.guild;
 
+
+ //console.log(JSON.stringify(data));
+ 
 	try {
 		if (utils.isMention(data.target)) {
 			let sid = utils.getSid(data.target);
 			if (data.method.toLowerCase() === 'select') {
 				let resData = [];
 				let separator = '|';
+	
 				let member = guild.members.cache.get(sid);
 
 				if (!member) return message.channel.send('User not found.');
@@ -83,6 +87,17 @@ module.exports.run = async (message, msg) => {
 											':' +
 											member.user.createdAt.getUTCSeconds()
 									);
+									
+									
+									  let roles = member._roles;
+									  
+									  roles = roles.map(r =>{
+									  	let role = message.guild.roles.cache.get(r);
+									  	return role.name;
+									  });
+									  
+									  resData.push(roles.join(", "));
+									
 								} else if (arg === 'username')
 									resData.push(member.user.username);
 								else if (arg === 'tag') resData.push(member.user.tag);
@@ -114,6 +129,16 @@ module.exports.run = async (message, msg) => {
 											':' +
 											member.user.createdAt.getUTCSeconds()
 									);
+									else if(arg === "roles"){
+									  let roles = member._roles;
+									  
+									  roles = roles.map(r =>{
+									  	let role = message.guild.roles.cache.get(r);
+									  	return role.name;
+									  });
+									  
+									  resData.push(roles.join(", "));
+									}
 							}
 
 							resolve();
@@ -133,98 +158,257 @@ module.exports.run = async (message, msg) => {
 				if (resData.length > 0) message.channel.send(resData.join(separator));
 				else message.channel.send('Please specify.');
 			}
+			else if(data.method.toLowerCase() === "update")
+			{
+				let member = guild.members.cache.get(sid);
+
+				if (!member) return message.channel.send('User not found.');
+				
+				message.channel.send(`Trying update data from user`);
+
+				data.params.forEach(async items => {
+					await new Promise(async resolve => {
+						if (items.type === 'set') {
+							let item = items.items;
+							if(typeof item !== "object") return;
+		         
+							for (let arg in item){
+					  		if (arg.toLowerCase() === 'nickname')
+							  	member.setNickname(item[arg]);
+						    else
+						    if(arg.toLowerCase() === "role.add"){
+						    	let role = message.guild.roles.cache.find(r => r.name === item[arg]);
+						    	
+						    	if(role)
+						    	await member.roles.add(role);
+						    	else return message.channel.send("Role doesn't exists.");
+						    }
+						    else
+						    if(arg.toLowerCase() === "role.remove"){
+						    	let role = message.guild.roles.cache.find(r => r.name === item[arg]);
+						    	
+						    	if(role)
+						    	await member.roles.remove(role);
+						    	else return message.channel.send("Role doesn't exists.");
+						    }
+							}
+
+							resolve();
+						}
+					});
+				});
+			}
 		} else {
 			if (data.target === '*') {
+				if(data.method.toLowerCase() === "select"){
 				let separator = '|';
+				let line = `\n`;
 				let count = null;
 				let membersFiltered = [];
 				let members = await guild.members.fetch();
+				
+				
 				let where = data.params.filter(it => {
 					if (it.type === 'where') return it.items;
 				})[0];
+				
+		   if(!members) return message.channel.send("It was not possible to fetch all members.");
+		   
+		  
 				if (typeof where !== 'object') where = null;
 
 				if (where) {
+		
 					members = members.filter(member => {
 						let isUser = [];
+			
 						for (let i in where.items) {
 							let arg = where.items[i];
-							let operator = i.match(/(<|=|>)$/g);
+							let operator = i.match(/(<|!|=|>)$/g);
 							operator = operator ? operator[0] : '=';
-							i = i.replace(/(<|=|>)$/g, '');
+							i = i.replace(/(<|!|=|>)$/g, '');
 
 							//console.log(separator, i, arg);
 
 							if (i === 'username') {
-								if (member.user.username === arg) isUser.push(true);
+								if(operator === "!"){
+								if (member.user.username !== arg) isUser.push(true);
 								else isUser.push(false);
+								}else{
+							if (member.user.username === arg) isUser.push(true);
+								else isUser.push(false);
+								}
 							} else if (i === 'username.includes') {
-								if (member.user.username.includes(arg)) isUser.push(true);
+								if(operator === "!"){
+								if (!member.user.username.includes(arg)) isUser.push(true);
 								else isUser.push(false);
+								}else{
+									if (member.user.username.includes(arg)) isUser.push(true);
+								else isUser.push(false);
+								}
 							} else if (i === 'username.startsWith') {
+								if(operator === "!"){
+								if (!member.user.username.startsWith(arg)) isUser.push(true);
+								else isUser.push(false);
+								}else{
 								if (member.user.username.startsWith(arg)) isUser.push(true);
 								else isUser.push(false);
+								}
 							} else if (i === 'username.endsWith') {
-								if (member.user.username.endsWith(arg)) isUser.push(true);
+								if(operator === "!"){
+								if (!member.user.username.endsWith(arg)) isUser.push(true);
 								else isUser.push(false);
+								}else{
+						if (member.user.username.endsWith(arg)) isUser.push(true);
+								else isUser.push(false);
+								}
 							} else if (i === 'isBot') {
-								if (member.user.bot === arg) isUser.push(true);
+								if(operator === "!"){
+								if (member.user.bot.toString() !== arg) isUser.push(true);
 								else isUser.push(false);
+								}else{
+						  	if (member.user.bot.toString() === arg) isUser.push(true);
+								else isUser.push(false);
+								}
 							} else if (i === 'avatar') {
-								if (member.user.avatar === arg) isUser.push(true);
+								if(operator === "!"){
+								if (member.user.avatar !== arg) isUser.push(true);
 								else isUser.push(false);
+								}else{
+							if (member.user.avatar === arg) isUser.push(true);
+								else isUser.push(false);
+								}
 							} else if (i === 'avatar.includes') {
+								if(operator === "!"){
+								if (!member.user.avatar.includes(arg)) isUser.push(true);
+								else isUser.push(false);
+								}else{
 								if (member.user.avatar.includes(arg)) isUser.push(true);
 								else isUser.push(false);
+								}
 							} else if (i === 'avatar.startsWith') {
-								if (member.user.avatar.startsWith(arg)) isUser.push(true);
+								if(operator === "!"){
+								if (!member.user.avatar.startsWith(arg)) isUser.push(true);
 								else isUser.push(false);
+								}else{
+									if (member.user.avatar.startsWith(arg)) isUser.push(true);
+								else isUser.push(false);
+								}
 							} else if (i === 'avatar.endsWith') {
-								if (member.user.avatar.endsWith(arg)) isUser.push(true);
+								if(operator === "!"){
+								if (!member.user.avatar.endsWith(arg)) isUser.push(true);
 								else isUser.push(false);
+								}else{
+									if (member.user.avatar.endsWith(arg)) isUser.push(true);
+								else isUser.push(false);
+								}
 							} else if (i === 'nickname') {
-								if (member.nickname === arg) isUser.push(true);
+								if(operator === "!"){
+								if (member.nickname !== arg) isUser.push(true);
 								else isUser.push(false);
+								}else{
+									if (member.nickname === arg) isUser.push(true);
+								else isUser.push(false);
+								}
 							} else if (i === 'nickname.includes') {
-								if (member.nickname && member.nickname.includes(arg))
+								if(operator === "!"){
+								if (member.nickname && !member.nickname.includes(arg))
 									isUser.push(true);
 								else isUser.push(false);
+								}else{
+									if (member.nickname && member.nickname.includes(arg))
+									isUser.push(true);
+								else isUser.push(false);
+								}
 							} else if (i === 'nickname.startsWith') {
-								if (member.nickname && member.nickname.startsWith(arg))
+								if(operator === "!"){
+								if (member.nickname && !member.nickname.startsWith(arg))
 									isUser.push(true);
 								else isUser.push(false);
+								}else{
+									if (member.nickname && member.nickname.startsWith(arg))
+									isUser.push(true);
+								else isUser.push(false);
+								}
 							} else if (i === 'nickname.endsWith') {
-								if (member.nickname && member.nickname.endsWith(arg))
+								if(operator === "!"){
+								if (member.nickname && !member.nickname.endsWith(arg))
 									isUser.push(true);
 								else isUser.push(false);
+								}else{
+									if (member.nickname && member.nickname.endsWith(arg))
+									isUser.push(true);
+								else isUser.push(false);
+								}
 							} else if (i === 'tag') {
 								if (member.user.tag === arg) isUser.push(true);
 								else isUser.push(false);
 							} else if (i === 'discriminator') {
-								if (member.user.discriminator === arg) isUser.push(true);
+								if(operator === "!"){
+								if (member.user.discriminator !== arg) isUser.push(true);
 								else isUser.push(false);
+								}else{
+									if (member.user.discriminator === arg) isUser.push(true);
+								else isUser.push(false);
+								}
 							} else if (i === 'discriminator.includes') {
-								if (member.user.discriminator.includes(arg)) isUser.push(true);
+								if(operator === "!"){
+								if (!member.user.discriminator.includes(arg)) isUser.push(true);
 								else isUser.push(false);
+								}else{
+									if (member.user.discriminator.includes(arg)) isUser.push(true);
+								else isUser.push(false);
+								}
 							} else if (i === 'discriminator.startsWith') {
-								if (member.user.discriminator.startsWith(arg))
+								if(operator === "!"){
+								if (!member.user.discriminator.startsWith(arg))
 									isUser.push(true);
 								else isUser.push(false);
-							} else if (i === 'discriminator.endsWith') {
-								if (member.user.discriminator.endsWith(arg)) isUser.push(true);
+								}else{
+									if (member.user.discriminator.startsWith(arg))
+									isUser.push(true);
 								else isUser.push(false);
+								}
+							} else if (i === 'discriminator.endsWith') {
+								if(operator === "!"){
+								if (!member.user.discriminator.endsWith(arg)) isUser.push(true);
+								else isUser.push(false);
+								}else{
+									if (member.user.discriminator.endsWith(arg)) isUser.push(true);
+								else isUser.push(false);
+								}
 							} else if (i === 'id') {
+								if(operator === "!"){
+									if (member.user.id !== arg) isUser.push(true);
+							  	else isUser.push(false);
+								}else{
 								if (member.user.id === arg) isUser.push(true);
 								else isUser.push(false);
+								}
 							} else if (i === 'id.includes') {
+        	if(operator === "!"){
+        		if (!member.user.id.includes(arg)) isUser.push(true);
+								else isUser.push(false);
+        	}else{
 								if (member.user.id.includes(arg)) isUser.push(true);
 								else isUser.push(false);
+        	}
 							} else if (i === 'id.startsWith') {
-								if (member.user.id.startsWith(arg)) isUser.push(true);
+								if(operator === "!"){
+								if (!member.user.id.startsWith(arg)) isUser.push(true);
 								else isUser.push(false);
+								}else{
+						if (member.user.id.startsWith(arg)) isUser.push(true);
+								else isUser.push(false);
+								}
 							} else if (i === 'id.endsWith') {
+							if(operator === "!"){
+								if (!member.user.id.endsWith(arg)) isUser.push(true);
+								else isUser.push(false);
+							}else{
 								if (member.user.id.endsWith(arg)) isUser.push(true);
 								else isUser.push(false);
+							}
 							} else if (i === 'joinedDate.hours') {
 								if (isNaN(arg)) {
 									isUser.push(false);
@@ -393,17 +577,42 @@ module.exports.run = async (message, msg) => {
 										isUser.push(true);
 									else isUser.push(false);
 								}
+							}else if(i === "role.has"){
+								let role;
+								
+								if(!isNaN(arg))
+								role = message.guild.roles.cache.get(arg);
+								else
+                role = message.guild.roles.cache.find(r => r.name === arg);
+                
+                
+						    if(!role){
+						    	isUser.push(false);
+						    	return;
+						    }
+						    
+						    if(operator === "!"){
+						    	if(!member._roles.includes(role.id))
+						    isUser.push(true);
+								else isUser.push(false);
+						    }else{
+						    if(member._roles.includes(role.id))
+						    isUser.push(true);
+								else isUser.push(false);
+						    }
+								
 							}
 						}
 
 						let can = utils.condition(where.separator.all, isUser);
-
-						if (can) {
+						
+						if (can === true) {
 							return member;
 						}
 					});
 				}
 			
+			  
 				if(members.size === 0) return message.channel.send("no users were found with these filters.");
 
 				members.forEach(async member => {
@@ -449,6 +658,16 @@ module.exports.run = async (message, msg) => {
 													':' +
 													member.user.createdAt.getUTCSeconds()
 											);
+											
+									  let roles = member._roles;
+									  
+									  roles = roles.map(r =>{
+									  	let role = message.guild.roles.cache.get(r);
+									  	return role.name;
+									  });
+									  
+									  resData.push(roles.join(", "));
+									
 										} else if (arg === 'username')
 											resData.push(member.user.username);
 										else if (arg === 'tag') resData.push(member.user.tag);
@@ -480,6 +699,16 @@ module.exports.run = async (message, msg) => {
 													':' +
 													member.user.createdAt.getUTCSeconds()
 											);
+									else if(arg === "roles"){
+									  let roles = member._roles;
+									  
+									  roles = roles.map(r =>{
+									  	let role = message.guild.roles.cache.get(r);
+									  	return role.name;
+									  });
+									  
+									  resData.push(roles.join(", "));
+									}
 									}
 									membersFiltered.push(resData);
 
@@ -491,11 +720,15 @@ module.exports.run = async (message, msg) => {
 									for (let arg in item) {
 										if (arg === 'separator') {
 											separator = item[arg];
-										} else if (arg === 'count') {
+										} 
+										else if (arg === 'count')
+										{
 											if (isNaN(item[arg])) return;
 
 											count = Number(item[arg]);
 										}
+										else if(arg === "line")
+										line = item[arg].replace(/\\n/g, "\n").replace(/\\s/g, "\s");
 									}
 								}
 							});
@@ -509,8 +742,13 @@ module.exports.run = async (message, msg) => {
 				if (count) compress = compress.slice(0, count);
 
 				if (membersFiltered.length > 0)
-					message.channel.send(compress.join('\n'));
+					message.channel.send(compress.join(line));
 				else message.channel.send('Please specify.');
+				
+				
+				}else if(data.method.toLowerCase() === "update"){
+					console.log("is")
+				}
 			} else {
 				let sid = utils.getSid(data.target);
 				if (data.method.toLowerCase() === 'select') {
@@ -567,6 +805,16 @@ module.exports.run = async (message, msg) => {
 												':' +
 												member.user.createdAt.getUTCSeconds()
 										);
+										
+									  let roles = member._roles;
+									  
+									  roles = roles.map(r =>{
+									  	let role = message.guild.roles.cache.get(r);
+									  	return role.name;
+									  });
+									  
+									  resData.push(roles.join(", "));
+									
 									} else if (arg === 'username')
 										resData.push(member.user.username);
 									else if (arg === 'tag') resData.push(member.user.tag);
@@ -598,6 +846,16 @@ module.exports.run = async (message, msg) => {
 												':' +
 												member.user.createdAt.getUTCSeconds()
 										);
+										else if(arg === "roles"){
+									  let roles = member._roles;
+									  
+									  roles = roles.map(r =>{
+									  	let role = message.guild.roles.cache.get(r);
+									  	return role.name;
+									  });
+									  
+									  resData.push(roles.join(", "));
+									}
 								}
 
 								resolve();
