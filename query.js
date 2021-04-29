@@ -265,7 +265,7 @@ module.exports.getAttributes = function(text) {
 	//console.log("first test: ", text);
 
 	text = text.replace(
-		/((WHERE .*)|(SET .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim,
+		/((WHERE .*)|(SET .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gims,
 		''
 	);
 	let separator = {
@@ -317,7 +317,7 @@ module.exports.getAttributes = function(text) {
 		.remove('|')
 		.remove('||');
 
-	//	console.log("last attr test: ",text)
+	// console.log("last attr test: ",text)
 	//	console.log("separator: ", separator)
 
 	return { separator: separator, text: text };
