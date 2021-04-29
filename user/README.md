@@ -10,7 +10,7 @@
 - joinedDate
 - isBot
 - discriminator
-- *
+- \*
 
 ### For WHERE clause
 <ul>
