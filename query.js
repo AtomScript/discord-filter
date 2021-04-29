@@ -1,39 +1,37 @@
 module.exports.getAttrValue = function(text) {
 	try {
-	//	console.log("First test: ", text);
-		
-		text = text.replace(/((WHERE .*)|(SET .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/g, '');
+		text = text.replace(/((WHERE .*)|(SET .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim, '');
 		
 		 //console.log("test 1:", text);
 
-		if (/(\b(FROM)\b)(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/g.test(text))
-			text = text.replace(/((FROM).*)?(?!.*\b\1\b)/g, '');
+		if (/(\b(FROM)\b)(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim.test(text))
+			text = text.replace(/((FROM).*)?(?!.*\b\1\b)/gim, '');
 
-		if (/(\b(WHERE)\b)(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/g.test(text))
-			text = text.replace(/((WHERE).*)(?!.*\b\1\b)/g, '');
+		if (/(\b(WHERE)\b)(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim.test(text))
+			text = text.replace(/((WHERE).*)(?!.*\b\1\b)/gim, '');
 
-		if (/(\b(ORDER BY)\b)(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/g.test(text))
-			text = text.replace(/((ORDER BY).*)(?!.*\b\1\b)/g, '');
+		if (/(\b(ORDER BY)\b)(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim.test(text))
+			text = text.replace(/((ORDER BY).*)(?!.*\b\1\b)/gim, '');
 
 		//	console.log("test 2: ",text);
 			
-		if (/(=)(?=(?:(?:[^"]*"?){2})*[^"]*$)((?=([^()]*\([^()]*\))*[^()]*$))/g.test(text)){
+		if (/(=)(?=(?:(?:[^"]*"?){2})*[^"]*$)((?=([^()]*\([^()]*\))*[^()]*$))/gim.test(text)){
 			idx = text
-				.split(/(=)(?=(?:(?:[^"]*"?){2})*[^"]*$)((?=([^()]*\([^()]*\))*[^()]*$))/g);
+				.split(/(=)(?=(?:(?:[^"]*"?){2})*[^"]*$)((?=([^()]*\([^()]*\))*[^()]*$))/gim);
 				
-			text = idx[idx.length-1].replace(/(^=)/g, '');
+			text = idx[idx.length-1].replace(/(^=)/gim, '');
 		}
 		else return null;
 		
 		
 	//console.log("test 3: ", text)
 
-		if (/^("([^"]*)")/g.test(text))
+		if (/^("([^"]*)")/gim.test(text))
 			text = text
-				.match(/^("([^"].*)(")(?!.*\b\1\b))/g)[0]
-				.replace(/^"/g, '')
-				.replace(/"$/g, '');
-		else text = text.replace(/(\s)$/g, '').replace(/^(\s)/g, '');
+				.match(/^("([^"].*)(")(?!.*\b\1\b))/gim)[0]
+				.replace(/^"/gim, '')
+				.replace(/"$/gim, '');
+		else text = text.replace(/(\s)$/gim, '').replace(/^(\s)/gim, '');
 
 	//console.log("last test: ",text)
 
@@ -44,24 +42,24 @@ module.exports.getAttrValue = function(text) {
 };
 
 module.exports.extractGroups = function(text) {
-	if (/(\(([^\(].*)(\)))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/g.test(text))
+	if (/(\(([^\(].*)(\)))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim.test(text))
 		return text.match(
-			/(\(([^\(].*)(\)))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/g
+			/(\(([^\(].*)(\)))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim
 		);
 	else return null;
 };
 
 module.exports.extractGroup = function(text) {
-	if (/(\(([^\(].*)(\)))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/g.test(text))
+	if (/(\(([^\(].*)(\)))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim.test(text))
 		return text
-			.match(/(\(([^\(].*)(\)))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/g)[0]
-			.replace(/^\(/g, '')
-			.replace(/\)$/g, '');
+			.match(/(\(([^\(].*)(\)))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim)[0]
+			.replace(/^\(/gim, '')
+			.replace(/\)$/gim, '');
 	else return null;
 };
 
 module.exports.isMention = function(text) {
-	return /<@[0-9]+>/g.test(text);
+	return /<@[0-9]+>/gim.test(text);
 };
 
 function containsOnly(separators, name) {
@@ -109,30 +107,30 @@ module.exports.condition = function(separators, conditions) {
 };
 
 module.exports.getAttr = function(text) {
-	if (/(\bFROM\b)(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/g.test(text))
+	if (/(\bFROM\b)(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim.test(text))
 		text = text = text.split(
-			/(\bFROM\b)(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/g
+			/(\bFROM\b)(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim
 		)[0];
 
 	try {
-		if (/(=(?=(?:(?:[^"]*"?){2})*[^"]*$))((?=([^()]*\([^()]*\))*[^()]*$))/g.test(text)) {
+		if (/(=(?=(?:(?:[^"]*"?){2})*[^"]*$))((?=([^()]*\([^()]*\))*[^()]*$))/gim.test(text)) {
 			return text
-				.split(/(=(?=(?:(?:[^"]*"?){2})*[^"]*$))((?=([^()]*\([^()]*\))*[^()]*$))/g)[0]
-				.replace(/\s/g, '');
+				.split(/(=(?=(?:(?:[^"]*"?){2})*[^"]*$))((?=([^()]*\([^()]*\))*[^()]*$))/gim)[0]
+				.replace(/\s/gim, '');
 		} else {
 			return text
-				.match(/.*? (FROM)/g)[0]
-				.replace(/\s(FROM)$/g, '')
-				.replace(/^\s/g, '')
-				.replace(/\s$/g, '');
+				.match(/.*? (FROM)/gim)[0]
+				.replace(/\s(FROM)$/gim, '')
+				.replace(/^\s/gim, '')
+				.replace(/\s$/gim, '');
 		}
 	} catch {
-		return text.replace(/(\s)+$/g, '').replace(/^(\s)+/g, '');
+		return text.replace(/(\s)+$/gim, '').replace(/^(\s)+/gim, '');
 	}
 };
 
 module.exports.getOrderBy = function(text) {
-	text = text.split(/(\bORDER BY\b)(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/g);
+	text = text.split(/(\bORDER BY\b)(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim);
 
 	text = text.remove('ORDER BY');
 
@@ -140,13 +138,13 @@ module.exports.getOrderBy = function(text) {
 	else text = null;
 	
  if(text !== null)
-	text = text.replace(/((WHERE .*)|(SET .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/g, '');
+	text = text.replace(/((WHERE .*)|(SET .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim, '');
 
 	return text;
 };
 
 module.exports.getValuesC = function(text) {
-	text = text.split(/(\bVALUES\b)(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/g);
+	text = text.split(/(\bVALUES\b)(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim);
 
 	text = text.remove('VALUES');
 
@@ -154,13 +152,13 @@ module.exports.getValuesC = function(text) {
 	else text = null;
   
   if(text !== null)
-	text = text.replace(/((WHERE .*)|(SET .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/g, '');
+	text = text.replace(/((WHERE .*)|(SET .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim, '');
 	
 	return text;
 };
 
 module.exports.getGroupBy = function(text) {
-	text = text.split(/(\bGROUP BY\b)(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/g);
+	text = text.split(/(\bGROUP BY\b)(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim);
 
 	text = text.remove('GROUP BY');
 
@@ -168,14 +166,14 @@ module.exports.getGroupBy = function(text) {
 	else text = null;
   
   if(text !== null)
-	text = text.replace(/((WHERE .*)|(SET .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/g, '');
+	text = text.replace(/((WHERE .*)|(SET .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim, '');
 	
 	return text;
 };
 
 module.exports.getParams = function(text) {
 	try {
-	text = text.split(/(\bWHERE\b)(?!.*\b\1\b)(?=(?:(?:[^"]*"?){2})*[^"]*$)/g);
+	text = text.split(/(\bWHERE\b)(?!.*\b\1\b)(?=(?:(?:[^"]*"?){2})*[^"]*$)/gim);
 
 	text = text.remove('WHERE');
 
@@ -190,14 +188,14 @@ module.exports.getParams = function(text) {
 
 module.exports.getTarget = function(text) {
 	text = text
-		.match(/FROM .*?(( SET .*)?|( WHERE)?|( ORDER BY)?|( VALUES)?|( GROUP BY)?|\s?)$/g);
+		.match(/FROM .*?(( SET .*)?|( WHERE)?|( ORDER BY)?|( VALUES)?|( GROUP BY)?|\s?)$/gim);
 		
 		if(text)
 		text = text[0]
-		.replace(/^(FROM)/g, '')
-		.replace(/((WHERE .*)|(SET .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/g, '')
-		.replace(/(\s)+$/g, '')
-		.replace(/^(\s)+/g, '');
+		.replace(/^(FROM)/gim, '')
+		.replace(/((WHERE .*)|(SET .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim, '')
+		.replace(/(\s)+$/gim, '')
+		.replace(/^(\s)+/gim, '');
 		else
     text = "";
 		
@@ -230,7 +228,7 @@ const willBeArray = array => {
 module.exports.getAttributes = function(text) {
  //console.log("first test: ", text);
  
-  text = text.replace(/((WHERE .*)|(SET .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/g, '');
+  text = text.replace(/((WHERE .*)|(SET .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim, '');
   let separator = {
   	all: [],
   	OR: [],
@@ -239,7 +237,7 @@ module.exports.getAttributes = function(text) {
   
   //console.log("test attr 1: ", text)
  
- let separators = text.match(/((AND|,|OR|&&|&|\|\||\|)(?=(?:(?:[^"]*"){2})*[^"]*$))((?=([^()]*\([^()]*\))*[^()]*$))(?!.*\b\1\b)/g) || [];
+ let separators = text.match(/((AND|,|OR|&&|&|\|\||\|)(?=(?:(?:[^"]*"){2})*[^"]*$))((?=([^()]*\([^()]*\))*[^()]*$))(?!.*\b\1\b)/gim) || [];
 
 separators = separators.filter(i => i === "AND"|| i === "OR" || i === "," || i === "&&" || i === "&" || i === "||" || i === "|");
  
@@ -258,7 +256,7 @@ separators = separators.filter(i => i === "AND"|| i === "OR" || i === "," || i =
 
   //console.log("test attr 2: ", text)
 
-	text = text.split(/((AND|,|OR|&&|&|\|\||\|)(?=(?:(?:[^"]*"){2})*[^"]*$))((?=([^()]*\([^()]*\))*[^()]*$))(?!.*\b\1\b)/g);
+	text = text.split(/((AND|,|OR|&&|&|\|\||\|)(?=(?:(?:[^"]*"){2})*[^"]*$))((?=([^()]*\([^()]*\))*[^()]*$))(?!.*\b\1\b)/gim);
 
 	text = text.remove('AND').remove(',').remove("&&").remove("&").remove("OR").remove("|").remove("||");
 	
@@ -269,7 +267,7 @@ separators = separators.filter(i => i === "AND"|| i === "OR" || i === "," || i =
 };
 
 module.exports.getSet = function(text) {
-	text = text.split(/(\bSET\b)(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/g);
+	text = text.split(/(\bSET\b)(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim);
 
 	text = text.remove('SET');
 
@@ -277,7 +275,7 @@ module.exports.getSet = function(text) {
 	else text = null;
   
   if(text !== null)
-	text = text.replace(/((WHERE .*)|(SET .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/g, '');
+	text = text.replace(/((WHERE .*)|(SET .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim, '');
 	
 	return text;
 };
@@ -294,9 +292,9 @@ module.exports.getAttributesBy = function(text, name) {
 };
 
 module.exports.getSid = function(text) {
-	if (/<@([0-9]+)>/g.test(text))
-		return text.match(/<@([0-9]+)>/g)[0].replace(/[<@>]/g, '');
-	else return text.replace(/[<@>]/g, '');
+	if (/<@([0-9]+)>/gim.test(text))
+		return text.match(/<@([0-9]+)>/gim)[0].replace(/[<@>]/gim, '');
+	else return text.replace(/[<@>]/gim, '');
 };
 
 module.exports.revertArray = function(arr) {
@@ -307,7 +305,7 @@ module.exports.revertArray = function(arr) {
 };
 
 module.exports.getMethod = function(text) {
-	return text.split(/ +/g)[0];
+	return text.split(/ +/gim)[0];
 };
 
 module.exports.parse = function(text) {
@@ -660,7 +658,7 @@ function clean(array) {
 	if (!Array.isArray(array)) return array;
 
 	for (let item of array) {
-		if (typeof item === 'string' && item.replace(/\s/g, '').length)
+		if (typeof item === 'string' && item.replace(/\s/gim, '').length)
 			newArr.push(item);
 	}
 
