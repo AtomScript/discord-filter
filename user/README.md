@@ -10,6 +10,7 @@
 - joinedDate
 - isBot
 - discriminator
+- *
 
 ### For WHERE clause
 <ul>
@@ -55,6 +56,8 @@
 ## For ORDER BY clause
 - separator
 - count
+- line
+- role.has
 
 ### Using query
 ```javascript
