@@ -2,4 +2,7 @@
 Fast discord filter interpreted by query
 
 # Available for:
-- user
+- Discord v12+
+
+# management for:
+- User
