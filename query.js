@@ -1,8 +1,11 @@
 module.exports.getAttrValue = function(text) {
 	try {
-		text = text.replace(/((WHERE .*)|(SET .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim, '');
-		
-		 //console.log("test 1:", text);
+		text = text.replace(
+			/((WHERE .*)|(SET .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim,
+			''
+		);
+
+		//console.log("test 1:", text);
 
 		if (/(\b(FROM)\b)(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim.test(text))
 			text = text.replace(/((FROM).*)?(?!.*\b\1\b)/gim, '');
@@ -10,30 +13,35 @@ module.exports.getAttrValue = function(text) {
 		if (/(\b(WHERE)\b)(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim.test(text))
 			text = text.replace(/((WHERE).*)(?!.*\b\1\b)/gim, '');
 
-		if (/(\b(ORDER BY)\b)(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim.test(text))
+		if (
+			/(\b(ORDER BY)\b)(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim.test(text)
+		)
 			text = text.replace(/((ORDER BY).*)(?!.*\b\1\b)/gim, '');
 
 		//	console.log("test 2: ",text);
-			
-		if (/(=)(?=(?:(?:[^"]*"?){2})*[^"]*$)((?=([^()]*\([^()]*\))*[^()]*$))/gim.test(text)){
-			idx = text
-				.split(/(=)(?=(?:(?:[^"]*"?){2})*[^"]*$)((?=([^()]*\([^()]*\))*[^()]*$))/gim);
-				
-			text = idx[idx.length-1].replace(/(^=)/gim, '');
-		}
-		else return null;
-		
-		
-	//console.log("test 3: ", text)
+
+		if (
+			/(=)(?=(?:(?:[^"]*"?){2})*[^"]*$)((?=([^()]*\([^()]*\))*[^()]*$))/gim.test(
+				text
+			)
+		) {
+			idx = text.split(
+				/(=)(?=(?:(?:[^"]*"?){2})*[^"]*$)((?=([^()]*\([^()]*\))*[^()]*$))/gim
+			);
+
+			text = idx[idx.length - 1].replace(/(^=)/gim, '');
+		} else return null;
+
+		//console.log("test 3: ", text)
 
 		if (/^("([^"]*)")/gim.test(text))
 			text = text
-				.match(/^("([^"].*)(")(?!.*\b\1\b))/gim)[0]
+				.match(/^("([^"]*)(")(?!.*\b\1\b))/gim)[0]
 				.replace(/^"/gim, '')
 				.replace(/"$/gim, '');
 		else text = text.replace(/(\s)$/gim, '').replace(/^(\s)/gim, '');
 
-	//console.log("last test: ",text)
+		//console.log("last test: ",text)
 
 		return text;
 	} catch {
@@ -64,44 +72,43 @@ module.exports.isMention = function(text) {
 
 function containsOnly(separators, name) {
 	let ex = 0;
-  
-	for(let i of separators)
-	if(i === name){
-		 ex++;
-	}
-	
+
+	for (let i of separators)
+		if (i === name) {
+			ex++;
+		}
+
 	return ex >= separators.length ? true : false;
 }
 
 module.exports.condition = function(separators, conditions) {
-	if(!Array.isArray(separators)) throw new Error("Separators must be an array.");
-	if(!Array.isArray(conditions)) throw new Error("Conditions must be an array.");
-	if(separators.length > conditions.length) throw new Error("Failed to compare.");
-	
-	
-	const onlyAND = containsOnly(separators, "AND");
-	const onlyOR = containsOnly(separators, "OR");
-	
-	if(onlyAND){
+	if (!Array.isArray(separators))
+		throw new Error('Separators must be an array.');
+	if (!Array.isArray(conditions))
+		throw new Error('Conditions must be an array.');
+	if (separators.length > conditions.length)
+		throw new Error('Failed to compare.');
+
+	const onlyAND = containsOnly(separators, 'AND');
+	const onlyOR = containsOnly(separators, 'OR');
+
+	if (onlyAND) {
 		let isFullTrue = 0;
-		
-		for(let i of conditions)
-		if(i === true) isFullTrue++;
-		
+
+		for (let i of conditions) if (i === true) isFullTrue++;
+
 		return isFullTrue >= conditions.length ? true : false;
-	}else if(onlyOR){
+	} else if (onlyOR) {
 		let includesTrue = false;
-		
-		for(let i of conditions)
-		if(i === true) includesTrue = true;
-		
+
+		for (let i of conditions) if (i === true) includesTrue = true;
+
 		return includesTrue;
-	}else{
+	} else {
 		let includesTrue = false;
-		
-		for(let i of conditions)
-		if(i === true) includesTrue = true;
-		
+
+		for (let i of conditions) if (i === true) includesTrue = true;
+
 		return includesTrue;
 	}
 };
@@ -113,9 +120,15 @@ module.exports.getAttr = function(text) {
 		)[0];
 
 	try {
-		if (/(=(?=(?:(?:[^"]*"?){2})*[^"]*$))((?=([^()]*\([^()]*\))*[^()]*$))/gim.test(text)) {
+		if (
+			/(=(?=(?:(?:[^"]*"?){2})*[^"]*$))((?=([^()]*\([^()]*\))*[^()]*$))/gim.test(
+				text
+			)
+		) {
 			return text
-				.split(/(=(?=(?:(?:[^"]*"?){2})*[^"]*$))((?=([^()]*\([^()]*\))*[^()]*$))/gim)[0]
+				.split(
+					/(=(?=(?:(?:[^"]*"?){2})*[^"]*$))((?=([^()]*\([^()]*\))*[^()]*$))/gim
+				)[0]
 				.replace(/\s/gim, '');
 		} else {
 			return text
@@ -130,15 +143,20 @@ module.exports.getAttr = function(text) {
 };
 
 module.exports.getOrderBy = function(text) {
-	text = text.split(/(\bORDER BY\b)(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim);
+	text = text.split(
+		/(\bORDER BY\b)(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim
+	);
 
 	text = text.remove('ORDER BY');
 
 	if (text.length > 1) text = text[text.length - 1];
 	else text = null;
-	
- if(text !== null)
-	text = text.replace(/((WHERE .*)|(SET .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim, '');
+
+	if (text !== null)
+		text = text.replace(
+			/((WHERE .*)|(SET .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim,
+			''
+		);
 
 	return text;
 };
@@ -150,56 +168,71 @@ module.exports.getValuesC = function(text) {
 
 	if (text.length > 1) text = text[text.length - 1];
 	else text = null;
-  
-  if(text !== null)
-	text = text.replace(/((WHERE .*)|(SET .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim, '');
-	
+
+	if (text !== null)
+		text = text.replace(
+			/((WHERE .*)|(SET .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim,
+			''
+		);
+
 	return text;
 };
 
 module.exports.getGroupBy = function(text) {
-	text = text.split(/(\bGROUP BY\b)(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim);
+	text = text.split(
+		/(\bGROUP BY\b)(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim
+	);
 
 	text = text.remove('GROUP BY');
 
 	if (text.length > 1) text = text[text.length - 1];
 	else text = null;
-  
-  if(text !== null)
-	text = text.replace(/((WHERE .*)|(SET .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim, '');
-	
+
+	if (text !== null)
+		text = text.replace(
+			/((WHERE .*)|(SET .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim,
+			''
+		);
+
 	return text;
 };
 
 module.exports.getParams = function(text) {
 	try {
-	text = text.split(/(\bWHERE\b)(?!.*\b\1\b)(?=(?:(?:[^"]*"?){2})*[^"]*$)/gim);
+		text = text.split(
+			/(\bWHERE\b)(?!.*\b\1\b)(?=(?:(?:[^"]*"?){2})*[^"]*$)/gim
+		);
 
-	text = text.remove('WHERE');
+		text = text.remove('WHERE');
 
-	text[0] = text[0]
-		.split(' ')
-		.slice(1)
-		.join(' ');
+		text[0] = text[0]
+			.split(' ')
+			.slice(1)
+			.join(' ');
 
-	return text;
-	}catch{return []};
+		return text;
+	} catch {
+		return [];
+	}
 };
 
 module.exports.getTarget = function(text) {
-	text = text
-		.match(/FROM .*?(( SET .*)?|( WHERE)?|( ORDER BY)?|( VALUES)?|( GROUP BY)?|\s?)$/gim);
-		
-		if(text)
+	text = text.match(
+		/FROM .*?(( SET .*)?|( WHERE)?|( ORDER BY)?|( VALUES)?|( GROUP BY)?|\s?)$/gim
+	);
+
+	if (text)
 		text = text[0]
-		.replace(/^(FROM)/gim, '')
-		.replace(/((WHERE .*)|(SET .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim, '')
-		.replace(/(\s)+$/gim, '')
-		.replace(/^(\s)+/gim, '');
-		else
-    text = "";
-		
-		return text;
+			.replace(/^(FROM)/gim, '')
+			.replace(
+				/((WHERE .*)|(SET .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim,
+				''
+			)
+			.replace(/(\s)+$/gim, '')
+			.replace(/^(\s)+/gim, '');
+	else text = '';
+
+	return text;
 };
 
 Array.prototype.remove = function(name) {
@@ -226,44 +259,65 @@ const willBeArray = array => {
 };
 
 module.exports.getAttributes = function(text) {
- //console.log("first test: ", text);
- 
-  text = text.replace(/((WHERE .*)|(SET .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim, '');
-  let separator = {
-  	all: [],
-  	OR: [],
-  	AND: []
-  }
-  
-  //console.log("test attr 1: ", text)
- 
- let separators = text.match(/((AND|,|OR|&&|&|\|\||\|)(?=(?:(?:[^"]*"){2})*[^"]*$))((?=([^()]*\([^()]*\))*[^()]*$))(?!.*\b\1\b)/gim) || [];
+	//console.log("first test: ", text);
 
-separators = separators.filter(i => i === "AND"|| i === "OR" || i === "," || i === "&&" || i === "&" || i === "||" || i === "|");
- 
- for(let i of separators){
-  if(i === "AND" || i === "," || i === "&&" || i === "&"){
- 	separator.all.push("AND");
- 	separator.AND.push("AND");
-  }
- 	else if(i === "OR" || i === "||" || i === "|")
-  {
-  	separator.OR.push("OR");
-  	separator.all.push("OR");
-  }
- }
- 
+	text = text.replace(
+		/((WHERE .*)|(SET .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim,
+		''
+	);
+	let separator = {
+		all: [],
+		OR: [],
+		AND: []
+	};
 
-  //console.log("test attr 2: ", text)
+	//console.log("test attr 1: ", text)
 
-	text = text.split(/((AND|,|OR|&&|&|\|\||\|)(?=(?:(?:[^"]*"){2})*[^"]*$))((?=([^()]*\([^()]*\))*[^()]*$))(?!.*\b\1\b)/gim);
+	let separators =
+		text.match(
+			/((AND|,|OR|&&|&|\|\||\|)(?=(?:(?:[^"]*"){2})*[^"]*$))((?=([^()]*\([^()]*\))*[^()]*$))(?!.*\b\1\b)/gim
+		) || [];
 
-	text = text.remove('AND').remove(',').remove("&&").remove("&").remove("OR").remove("|").remove("||");
-	
-//	console.log("last attr test: ",text)
-//	console.log("separator: ", separator)
+	separators = separators.filter(
+		i =>
+			i === 'AND' ||
+			i === 'OR' ||
+			i === ',' ||
+			i === '&&' ||
+			i === '&' ||
+			i === '||' ||
+			i === '|'
+	);
 
-	return {separator: separator, text: text};
+	for (let i of separators) {
+		if (i === 'AND' || i === ',' || i === '&&' || i === '&') {
+			separator.all.push('AND');
+			separator.AND.push('AND');
+		} else if (i === 'OR' || i === '||' || i === '|') {
+			separator.OR.push('OR');
+			separator.all.push('OR');
+		}
+	}
+
+	//console.log("test attr 2: ", text)
+
+	text = text.split(
+		/((AND|,|OR|&&|&|\|\||\|)(?=(?:(?:[^"]*"){2})*[^"]*$))((?=([^()]*\([^()]*\))*[^()]*$))(?!.*\b\1\b)/gim
+	);
+
+	text = text
+		.remove('AND')
+		.remove(',')
+		.remove('&&')
+		.remove('&')
+		.remove('OR')
+		.remove('|')
+		.remove('||');
+
+	//	console.log("last attr test: ",text)
+	//	console.log("separator: ", separator)
+
+	return { separator: separator, text: text };
 };
 
 module.exports.getSet = function(text) {
@@ -273,10 +327,13 @@ module.exports.getSet = function(text) {
 
 	if (text.length > 1) text = text[text.length - 1];
 	else text = null;
-  
-  if(text !== null)
-	text = text.replace(/((WHERE .*)|(SET .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim, '');
-	
+
+	if (text !== null)
+		text = text.replace(
+			/((WHERE .*)|(SET .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim,
+			''
+		);
+
 	return text;
 };
 
@@ -337,26 +394,20 @@ module.exports.parse = function(text) {
 							items: {},
 							groups: []
 						};
-						
-						
+
 						let SubParams = this.getAttributes(param);
-	
-						
+
 						let separator = SubParams.separator;
 						SubParams = SubParams.text;
-						
-				
-						if(separator)
-						summary.params[0].separator = separator;
-						
+
+						if (separator) summary.params[0].separator = separator;
+
 						let willbe = willBeArray(SubParams);
 
 						SubParams.forEach(async sp => {
 							await new Promise(resolve3 => {
 								let attr = this.getAttr(sp);
 								let value = this.getAttrValue(sp);
-								
-			
 
 								if (value !== null) {
 									if (Array.isArray(summary.params[0]['items'])) {
@@ -394,10 +445,9 @@ module.exports.parse = function(text) {
 						let SubParams = this.getAttributes(param);
 						let separator = SubParams.separator;
 						SubParams = SubParams.text;
-						
-		   	  	if(separator)
-						summary.params[1].separator = separator;
-						
+
+						if (separator) summary.params[1].separator = separator;
+
 						let willbe = willBeArray(SubParams);
 
 						SubParams.forEach(async sp => {
@@ -446,12 +496,10 @@ module.exports.parse = function(text) {
 
 				let SubParams = this.getAttributes(ordby);
 				let separator = SubParams.separator;
-						SubParams = SubParams.text;
-				
-				if(separator)
-				summary.params[2].separator = separator;
-						
-				
+				SubParams = SubParams.text;
+
+				if (separator) summary.params[2].separator = separator;
+
 				let willbe = willBeArray(SubParams);
 
 				SubParams.forEach(async sp => {
@@ -484,9 +532,8 @@ module.exports.parse = function(text) {
 
 				resolve2();
 			});
-			
-			
-					if (gpby !== null)
+
+		if (gpby !== null)
 			await new Promise(resolve2 => {
 				summary.params[3] = {
 					type: 'GroupBy',
@@ -496,13 +543,11 @@ module.exports.parse = function(text) {
 
 				let SubParams = this.getAttributes(gpby);
 				let separator = SubParams.separator;
-						SubParams = SubParams.text;
+				SubParams = SubParams.text;
 				let willbe = willBeArray(SubParams);
 
-				if(separator)
-				summary.params[3].separator = separator;
-						
-     
+				if (separator) summary.params[3].separator = separator;
+
 				SubParams.forEach(async sp => {
 					await new Promise(resolve3 => {
 						let attr = this.getAttr(sp);
@@ -533,9 +578,8 @@ module.exports.parse = function(text) {
 
 				resolve2();
 			});
-			
-			
-			if (valuesC !== null)
+
+		if (valuesC !== null)
 			await new Promise(resolve2 => {
 				summary.params[4] = {
 					type: 'values',
@@ -544,13 +588,11 @@ module.exports.parse = function(text) {
 
 				let SubParams = this.getAttributes(valuesC);
 				let separator = SubParams.separator;
-						SubParams = SubParams.text;
-						
+				SubParams = SubParams.text;
+
 				let willbe = willBeArray(SubParams);
 
-			if(separator)
-			summary.params[4].separator = separator;
-						
+				if (separator) summary.params[4].separator = separator;
 
 				SubParams.forEach(async sp => {
 					await new Promise(resolve3 => {
@@ -583,9 +625,7 @@ module.exports.parse = function(text) {
 				resolve2();
 			});
 
-
-
-      if (getSet !== null)
+		if (getSet !== null)
 			await new Promise(resolve2 => {
 				summary.params[5] = {
 					type: 'set',
@@ -594,13 +634,11 @@ module.exports.parse = function(text) {
 
 				let SubParams = this.getAttributes(getSet);
 				let separator = SubParams.separator;
-						SubParams = SubParams.text;
-						
+				SubParams = SubParams.text;
+
 				let willbe = willBeArray(SubParams);
 
-			if(separator)
-			summary.params[5].separator = separator;
-						
+				if (separator) summary.params[5].separator = separator;
 
 				SubParams.forEach(async sp => {
 					await new Promise(resolve3 => {
@@ -632,10 +670,6 @@ module.exports.parse = function(text) {
 
 				resolve2();
 			});
-
-
-
-
 
 		summary.params = summary.params.remove(null);
 
@@ -743,12 +777,12 @@ module.exports.stringify = function(obj) {
 };
 
 module.exports.isValid = function(text) {
-	try{
+	try {
 		text = this.parse(text);
-		
-		if(text)
-		return true;
-		else
-    return false;
-	}catch{ return false };
+
+		if (text) return true;
+		else return false;
+	} catch {
+		return false;
+	}
 };
