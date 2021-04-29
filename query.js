@@ -1,11 +1,14 @@
 module.exports.getAttrValue = function(text) {
 	try {
+		//console.log("first test: ", text);
+		
+		
 		text = text.replace(
 			/((WHERE .*)|(SET .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim,
 			''
 		);
 
-		//console.log("test 1:", text);
+	//	console.log("test 1:", text);
 
 		if (/(\b(FROM)\b)(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim.test(text))
 			text = text.replace(/((FROM).*)?(?!.*\b\1\b)/gim, '');
@@ -41,7 +44,7 @@ module.exports.getAttrValue = function(text) {
 				.replace(/"$/gim, '');
 		else text = text.replace(/(\s)$/gim, '').replace(/^(\s)/gim, '');
 
-		//console.log("last test: ",text)
+	//	console.log("last test: ",text)
 
 		return text;
 	} catch {
@@ -302,7 +305,7 @@ module.exports.getAttributes = function(text) {
 	//console.log("test attr 2: ", text)
 
 	text = text.split(
-		/((AND|,|OR|&&|&|\|\||\|)(?=(?:(?:[^"]*"){2})*[^"]*$))((?=([^()]*\([^()]*\))*[^()]*$))(?!.*\b\1\b)/gim
+		/((AND|,|OR|&&|&|\|\||\|)(?=(?:(?:[^"]*"){2})*[^"]*$))((?=([^()]*\([^()]*\))*[^()]*$))(?!.*\b\1\b)/g
 	);
 
 	text = text
@@ -495,6 +498,7 @@ module.exports.parse = function(text) {
 				};
 
 				let SubParams = this.getAttributes(ordby);
+			
 				let separator = SubParams.separator;
 				SubParams = SubParams.text;
 
