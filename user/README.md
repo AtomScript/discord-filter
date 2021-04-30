@@ -40,8 +40,6 @@
 <li>id<ul>
 <li>operators<ul>
 <li>=</li>
-<li><</li>
-<li>></li>
 <li>!</li>
 </ul></li>
 <li>includes</li>
@@ -51,8 +49,6 @@
 <li>discriminator<ul>
 <li>operators<ul>
 <li>=</li>
-<li><</li>
-<li>></li>
 <li>!</li>
 </ul></li>
 <li>includes</li>
