@@ -2,7 +2,7 @@
 
 ### Requirements
 
-###### Enable this option
+###### enable this option to get more advantages over member manipulation
 [![help.png](https://i.postimg.cc/WpSrctYy/help.png)](https://postimg.cc/Sj2jWQhL)
 
 ### Attributes
@@ -22,8 +22,6 @@
 <li>username<ul>
 <li>operators<ul>
 <li>=</li>
-<li><</li>
-<li>></li>
 <li>!</li>
 </ul></li>
 <li>includes</li>
@@ -33,8 +31,6 @@
 <li>nickname<ul>
 <li>operators<ul>
 <li>=</li>
-<li><</li>
-<li>></li>
 <li>!</li>
 </ul></li>
 <li>includes</li>
@@ -68,7 +64,6 @@
 <li>=</li>
 <li><</li>
 <li>></li>
-<li>!</li>
 </ul></li>
 <li>hours</li>
 <li>days</li>
@@ -79,7 +74,6 @@
 <li>=</li>
 <li><</li>
 <li>></li>
-<li>!</li>
 </ul></li>
 <li>hours</li>
 <li>days</li>
@@ -88,21 +82,24 @@
 <li>isBot<ul>
 <li>operators<ul>
 <li>=</li>
-<li><</li>
-<li>></li>
 <li>!</li>
 </ul></li></ul></li>
 <li>tag</li>
 <li>avatar<ul>
 <li>operators<ul>
 <li>=</li>
-<li><</li>
-<li>></li>
 <li>!</li>
 </ul></li>
 <li>includes</li>
 <li>startsWith</li>
 <li>endsWith</li>
+</ul></li>
+<li>role<ul>
+<li>operators<ul>
+<li>=</li>
+<li>!</li>
+</ul></li>
+<li>has</li>
 </ul></li>
 </ul>
 
@@ -110,7 +107,15 @@
 - separator
 - count
 - line
-- role.has
+
+#### separator
+Separates the filtered results from the member (s) found.
+
+#### count
+Limits the number of members found.
+
+#### line
+Specifies the line that separates each member.
 
 ### Using query
 ```javascript
