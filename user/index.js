@@ -34,7 +34,7 @@ module.exports.run = async (message, msg) => {
 	const guild = message.guild;
 
 
- //console.log(JSON.stringify(data));
+   //console.log(JSON.stringify(data));
  
 	try {
 		if (utils.isMention(data.target)) {
@@ -228,10 +228,10 @@ module.exports.run = async (message, msg) => {
 							operator = operator ? operator[0] : '=';
 							i = i.replace(/(<|!|=|>)$/g, '');
 
-							//console.log(separator, i, arg);
+					//		console.log(i, /(role\.has( \([0-9]\))?)$/g.test(i));
 
-					   if(/(username)$( \([0-9]\))?/g.test(i)) {
-					   	console.log("match")
+					   if(/(username( \([0-9]\))?)$/g.test(i)) {
+	
 								if(operator === "!"){
 								if (member.user.username !== arg) isUser.push(true);
 								else isUser.push(false);
@@ -239,7 +239,7 @@ module.exports.run = async (message, msg) => {
 							if (member.user.username === arg) isUser.push(true);
 								else isUser.push(false);
 								}
-							} else if(/(username\.includes)$( \([0-9]\))?/g.test(i)) {
+							} else if(/(username\.includes( \([0-9]\))?)$/g.test(i)) {
 								if(operator === "!"){
 								if (!member.user.username.includes(arg)) isUser.push(true);
 								else isUser.push(false);
@@ -247,7 +247,7 @@ module.exports.run = async (message, msg) => {
 									if (member.user.username.includes(arg)) isUser.push(true);
 								else isUser.push(false);
 								}
-							} else if(/(username\.startsWith)$( \([0-9]\))?/g.test(i)) {
+							} else if(/(username\.startsWith( \([0-9]\))?)$/g.test(i)) {
 								if(operator === "!"){
 								if (!member.user.username.startsWith(arg)) isUser.push(true);
 								else isUser.push(false);
@@ -255,7 +255,7 @@ module.exports.run = async (message, msg) => {
 								if (member.user.username.startsWith(arg)) isUser.push(true);
 								else isUser.push(false);
 								}
-							} else if(/(username\.endsWith)$( \([0-9]\))?/g.test(i)) {
+							} else if(/(username\.endsWith( \([0-9]\))?)$/g.test(i)) {
 								if(operator === "!"){
 								if (!member.user.username.endsWith(arg)) isUser.push(true);
 								else isUser.push(false);
@@ -263,7 +263,7 @@ module.exports.run = async (message, msg) => {
 						if (member.user.username.endsWith(arg)) isUser.push(true);
 								else isUser.push(false);
 								}
-							} else if(/(isBot)$( \([0-9]\))?/g.test(i)) {
+							} else if(/(isBot( \([0-9]\))?)$/g.test(i)) {
 								if(operator === "!"){
 								if (member.user.bot.toString() !== arg) isUser.push(true);
 								else isUser.push(false);
@@ -271,7 +271,7 @@ module.exports.run = async (message, msg) => {
 						  	if (member.user.bot.toString() === arg) isUser.push(true);
 								else isUser.push(false);
 								}
-							} else if(/(avatar)$( \([0-9]\))?/g.test(i)) {
+							} else if(/(avatar( \([0-9]\))?)$/g.test(i)) {
 								if(operator === "!"){
 								if (member.user.avatar !== arg) isUser.push(true);
 								else isUser.push(false);
@@ -279,7 +279,7 @@ module.exports.run = async (message, msg) => {
 							if (member.user.avatar === arg) isUser.push(true);
 								else isUser.push(false);
 								}
-							} else if(/(avatar\.includes)$( \([0-9]\))?/g.test(i)) {
+							} else if(/(avatar\.includes( \([0-9]\))?)$/g.test(i)) {
 								if(operator === "!"){
 								if (!member.user.avatar.includes(arg)) isUser.push(true);
 								else isUser.push(false);
@@ -287,7 +287,7 @@ module.exports.run = async (message, msg) => {
 								if (member.user.avatar.includes(arg)) isUser.push(true);
 								else isUser.push(false);
 								}
-							} else if(/(avatar\.startsWith)$( \([0-9]\))?/g.test(i)) {
+							} else if(/(avatar\.startsWith( \([0-9]\))?)$/g.test(i)) {
 								if(operator === "!"){
 								if (!member.user.avatar.startsWith(arg)) isUser.push(true);
 								else isUser.push(false);
@@ -295,7 +295,7 @@ module.exports.run = async (message, msg) => {
 									if (member.user.avatar.startsWith(arg)) isUser.push(true);
 								else isUser.push(false);
 								}
-							} else if(/(avatar\.endsWith)$( \([0-9]\))?/g.test(i)) {
+							} else if(/(avatar\.endsWith( \([0-9]\))?)$/g.test(i)) {
 								if(operator === "!"){
 								if (!member.user.avatar.endsWith(arg)) isUser.push(true);
 								else isUser.push(false);
@@ -303,7 +303,7 @@ module.exports.run = async (message, msg) => {
 									if (member.user.avatar.endsWith(arg)) isUser.push(true);
 								else isUser.push(false);
 								}
-							} else if(/(nickname)$( \([0-9]\))?/g.test(i)) {
+							} else if(/(nickname( \([0-9]\))?)$/g.test(i)) {
 								if(operator === "!"){
 								if (member.nickname !== arg) isUser.push(true);
 								else isUser.push(false);
@@ -311,7 +311,7 @@ module.exports.run = async (message, msg) => {
 									if (member.nickname === arg) isUser.push(true);
 								else isUser.push(false);
 								}
-							} else if(/(nickname\.includes)$( \([0-9]\))?/g.test(i)) {
+							} else if(/(nickname\.includes( \([0-9]\))?)$/g.test(i)) {
 								if(operator === "!"){
 								if (member.nickname && !member.nickname.includes(arg))
 									isUser.push(true);
@@ -321,7 +321,7 @@ module.exports.run = async (message, msg) => {
 									isUser.push(true);
 								else isUser.push(false);
 								}
-							} else if(/(nickname\.startsWith)$( \([0-9]\))?/g.test(i)) {
+							} else if(/(nickname\.startsWith( \([0-9]\))?)$/g.test(i)) {
 								if(operator === "!"){
 								if (member.nickname && !member.nickname.startsWith(arg))
 									isUser.push(true);
@@ -331,7 +331,7 @@ module.exports.run = async (message, msg) => {
 									isUser.push(true);
 								else isUser.push(false);
 								}
-							} else if(/(nickname\.endsWith)$( \([0-9]\))?/g.test(i)){
+							} else if(/(nickname\.endsWith( \([0-9]\))?)$/g.test(i)){
 								if(operator === "!"){
 								if (member.nickname && !member.nickname.endsWith(arg))
 									isUser.push(true);
@@ -341,10 +341,10 @@ module.exports.run = async (message, msg) => {
 									isUser.push(true);
 								else isUser.push(false);
 								}
-							} else if(/tag( \([0-9]\))?/g.test(i)){
+							} else if(/(tag( \([0-9]\))?)$/g.test(i)){
 								if (member.user.tag === arg) isUser.push(true);
 								else isUser.push(false);
-							} else if(/(discriminator)$( \([0-9]\))?/g.test(i)) {
+							} else if(/(discriminator( \([0-9]\))?)$/g.test(i)) {
 								if(operator === "!"){
 								if (member.user.discriminator !== arg) isUser.push(true);
 								else isUser.push(false);
@@ -352,7 +352,7 @@ module.exports.run = async (message, msg) => {
 									if (member.user.discriminator === arg) isUser.push(true);
 								else isUser.push(false);
 								}
-							} else if(/(discriminator\.includes)$( \([0-9]\))?/g.test(i)){
+							} else if(/(discriminator\.includes( \([0-9]\))?)$/g.test(i)){
 								if(operator === "!"){
 								if (!member.user.discriminator.includes(arg)) isUser.push(true);
 								else isUser.push(false);
@@ -360,7 +360,7 @@ module.exports.run = async (message, msg) => {
 									if (member.user.discriminator.includes(arg)) isUser.push(true);
 								else isUser.push(false);
 								}
-							} else if(/(discriminator\.startsWith)$( \([0-9]\))?/g.test(i)) {
+							} else if(/(discriminator\.startsWith( \([0-9]\))?)$/g.test(i)) {
 								if(operator === "!"){
 								if (!member.user.discriminator.startsWith(arg))
 									isUser.push(true);
@@ -370,7 +370,7 @@ module.exports.run = async (message, msg) => {
 									isUser.push(true);
 								else isUser.push(false);
 								}
-							} else if(/(discriminator\.endsWith)$( \([0-9]\))?/g.test(i)) {
+							} else if(/(discriminator\.endsWith( \([0-9]\))?)$/g.test(i)) {
 								if(operator === "!"){
 								if (!member.user.discriminator.endsWith(arg)) isUser.push(true);
 								else isUser.push(false);
@@ -378,7 +378,7 @@ module.exports.run = async (message, msg) => {
 									if (member.user.discriminator.endsWith(arg)) isUser.push(true);
 								else isUser.push(false);
 								}
-							} else if(/(id)$( \([0-9]\))?/g.test(i)){
+							} else if(/(id( \([0-9]\))?)$/g.test(i)){
 								if(operator === "!"){
 									if (member.user.id !== arg) isUser.push(true);
 							  	else isUser.push(false);
@@ -386,7 +386,7 @@ module.exports.run = async (message, msg) => {
 								if (member.user.id === arg) isUser.push(true);
 								else isUser.push(false);
 								}
-							} else if(/(id\.includes)$( \([0-9]\))?/g.test(i)) {
+							} else if(/(id\.includes( \([0-9]\))?)$/g.test(i)) {
         	if(operator === "!"){
         		if (!member.user.id.includes(arg)) isUser.push(true);
 								else isUser.push(false);
@@ -394,7 +394,7 @@ module.exports.run = async (message, msg) => {
 								if (member.user.id.includes(arg)) isUser.push(true);
 								else isUser.push(false);
         	}
-							} else if(/(id\.startsWith)$( \([0-9]\))?/g.test(i)) {
+							} else if(/(id\.startsWith( \([0-9]\))?)$/g.test(i)) {
 								if(operator === "!"){
 								if (!member.user.id.startsWith(arg)) isUser.push(true);
 								else isUser.push(false);
@@ -402,7 +402,7 @@ module.exports.run = async (message, msg) => {
 						if (member.user.id.startsWith(arg)) isUser.push(true);
 								else isUser.push(false);
 								}
-							} else if(/(id\.endsWith)$( \([0-9]\))?/g.test(i)) {
+							} else if(/(id\.endsWith( \([0-9]\))?)$/g.test(i)) {
 							if(operator === "!"){
 								if (!member.user.id.endsWith(arg)) isUser.push(true);
 								else isUser.push(false);
@@ -410,7 +410,7 @@ module.exports.run = async (message, msg) => {
 								if (member.user.id.endsWith(arg)) isUser.push(true);
 								else isUser.push(false);
 							}
-							} else if(/(joinedDate\.hours)$( \([0-9]\))?/g.test(i)){
+							} else if(/(joinedDate\.hours( \([0-9]\))?)$/g.test(i)){
 								if (isNaN(arg)) {
 									isUser.push(false);
 									return;
@@ -438,7 +438,7 @@ module.exports.run = async (message, msg) => {
 										isUser.push(true);
 									else isUser.push(false);
 								}
-							} else if(/(joinedDate\.months)$( \([0-9]\))?/g.test(i)){
+							} else if(/(joinedDate\.months( \([0-9]\))?)$/g.test(i)){
 								if (isNaN(arg)) {
 									isUser.push(false);
 									return;
@@ -466,7 +466,7 @@ module.exports.run = async (message, msg) => {
 										isUser.push(true);
 									else isUser.push(false);
 								}
-							} else if(/(joinedDate\.days)$( \([0-9]\))?/g.test(i)){
+							} else if(/(joinedDate\.days( \([0-9]\))?)$/g.test(i)){
 								if (isNaN(arg)) {
 									isUser.push(false);
 									return;
@@ -494,7 +494,7 @@ module.exports.run = async (message, msg) => {
 										isUser.push(true);
 									else isUser.push(false);
 								}
-							} else if(/(createdDate\.days)$( \([0-9]\))?/g.test(i)) {
+							} else if(/(createdDate\.days( \([0-9]\))?)$/g.test(i)) {
 								if (isNaN(arg)) {
 									isUser.push(false);
 									return;
@@ -522,7 +522,7 @@ module.exports.run = async (message, msg) => {
 										isUser.push(true);
 									else isUser.push(false);
 								}
-							} else if(/(createdDate\.hours)$( \([0-9]\))?/g.test(i)){
+							} else if(/(createdDate\.hours( \([0-9]\))?)$/g.test(i)){
 								if (isNaN(arg)) {
 									isUser.push(false);
 									return;
@@ -550,7 +550,7 @@ module.exports.run = async (message, msg) => {
 										isUser.push(true);
 									else isUser.push(false);
 								}
-							} else if(/(createdDate\.months)$( \([0-9]\))?/g.test(i)){
+							} else if(/(createdDate\.months( \([0-9]\))?)$/g.test(i)){
 								if (isNaN(arg)) {
 									isUser.push(false);
 									return;
@@ -578,7 +578,7 @@ module.exports.run = async (message, msg) => {
 										isUser.push(true);
 									else isUser.push(false);
 								}
-							}else if(/(role\.has)$( \([0-9]\))?/g.test(i)){
+							}else if(/(role\.has( \([0-9]\))?)$/g.test(i)){
 								let role;
 								
 								if(!isNaN(arg))
