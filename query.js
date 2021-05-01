@@ -368,6 +368,20 @@ module.exports.getMethod = function(text) {
 	return text.split(/ +/gim)[0];
 };
 
+module.exports.countProperty = function(obj, text){
+try{
+	if(typeof obj !== "object") return null;
+	if(Object.keys(obj).length === 0 && obj.constructor === Object) return 0;
+	
+	obj = Object.keys(obj).filter(i =>{
+		if(new RegExp(`${i.replace(/( \([0-9]\))$/g, "")}( \([0-9]\))?`, "g").test(i))
+		return i;
+	});
+	
+	return obj ? obj.length : 0;
+}catch{return null};
+}
+
 module.exports.parse = function(text) {
 	return new Promise(async (resolve, reject) => {
 		if (typeof text !== 'string') {
@@ -457,6 +471,10 @@ module.exports.parse = function(text) {
 							await new Promise(resolve3 => {
 								let attr = this.getAttr(sp);
 								let value = this.getAttrValue(sp);
+								
+								let newitem = this.countProperty(summary.params[1].items, attr);
+								if(newitem)
+								attr = `${attr} (${newitem+1})`;
 
 								if (value !== null) {
 									if (Array.isArray(summary.params[1]['items'])) {
