@@ -1,25 +1,24 @@
 module.exports.getAttrValue = function(text) {
 	try {
-		//console.log("first test: ", text);
-		
+	//	console.log("first test: ", text);
 		
 		text = text.replace(
-			/((WHERE .*)|(SET .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(DESC .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim,
+			/((WHERE .*([\s\S]+)?)|(SET .*([\s\S]+)?)|(VALUES .*([\s\S]+)?)|(GROUP BY .*([\s\S]+)?)|(FROM .*([\s\S]+)?)|(DESC .*([\s\S]+)?)|(ORDER BY .*([\s\S]+)?))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim,
 			''
 		);
 
-	//	console.log("test 1:", text);
+		//console.log("test 1:", text);
 
 		if (/(\b(FROM)\b)(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim.test(text))
-			text = text.replace(/((FROM).*)?(?!.*\b\1\b)/gim, '');
+			text = text.replace(/((FROM).*([\s\S]+)?)?(?!.*\b\1\b)/gim, '');
 
 		if (/(\b(WHERE)\b)(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim.test(text))
-			text = text.replace(/((WHERE).*)(?!.*\b\1\b)/gim, '');
+			text = text.replace(/((WHERE).*([\s\S]+)?)(?!.*\b\1\b)/gim, '');
 
 		if (
 			/(\b(ORDER BY)\b)(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim.test(text)
 		)
-			text = text.replace(/((ORDER BY).*)(?!.*\b\1\b)/gim, '');
+			text = text.replace(/((ORDER BY).*([\s\S]+)?)(?!.*\b\1\b)/gim, '');
 
 		//	console.log("test 2: ",text);
 
@@ -157,7 +156,7 @@ module.exports.getOrderBy = function(text) {
 
 	if (text !== null)
 		text = text.replace(
-			/((WHERE .*)|(SET .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(DESC .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim,
+			/((WHERE .*([\s\S]+)?)|(SET .*([\s\S]+)?)|(VALUES .*([\s\S]+)?)|(GROUP BY .*([\s\S]+)?)|(FROM .*([\s\S]+)?)|(DESC .*([\s\S]+)?)|(ORDER BY .*([\s\S]+)?))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim,
 			''
 		);
 
@@ -176,7 +175,7 @@ module.exports.getDesc = function(text) {
 
 	if (text !== null)
 		text = text.replace(
-			/((WHERE .*)|(SET .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(DESC .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim,
+			/((WHERE .*([\s\S]+)?)|(SET .*([\s\S]+)?)|(VALUES .*([\s\S]+)?)|(GROUP BY .*([\s\S]+)?)|(FROM .*([\s\S]+)?)|(DESC .*([\s\S]+)?)|(ORDER BY .*([\s\S]+)?))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim,
 			''
 		);
 
@@ -193,7 +192,7 @@ module.exports.getValuesC = function(text) {
 
 	if (text !== null)
 		text = text.replace(
-			/((WHERE .*)|(SET .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(DESC .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim,
+			/((WHERE .*([\s\S]+)?)|(SET .*([\s\S]+)?)|(VALUES .*([\s\S]+)?)|(GROUP BY .*([\s\S]+)?)|(FROM .*([\s\S]+)?)|(DESC .*([\s\S]+)?)|(ORDER BY .*([\s\S]+)?))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim,
 			''
 		);
 
@@ -212,7 +211,7 @@ module.exports.getGroupBy = function(text) {
 
 	if (text !== null)
 		text = text.replace(
-			/((WHERE .*)|(SET .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(DESC .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim,
+			/((WHERE .*([\s\S]+)?)|(SET .*([\s\S]+)?)|(VALUES .*([\s\S]+)?)|(GROUP BY .*([\s\S]+)?)|(FROM .*([\s\S]+)?)|(DESC .*([\s\S]+)?)|(ORDER BY .*([\s\S]+)?))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim,
 			''
 		);
 
@@ -226,7 +225,7 @@ module.exports.getParams = function(text) {
 		);
 
 		text = text.remove('WHERE');
-
+		
 		text[0] = text[0]
 			.split(' ')
 			.slice(1)
@@ -241,7 +240,8 @@ module.exports.getParams = function(text) {
 module.exports.getTarget = function(text) {
 	text = text.match(/FROM .*?(( SET .*)?|( WHERE)?|( ORDER BY)?|( DESC)?|( VALUES)?|( GROUP BY)?|\s?)$/gim
 	);
-
+	
+ 
 	if (text)
 		text = text[0]
 			.replace(/^(FROM)/gim, '')
@@ -283,9 +283,10 @@ module.exports.getAttributes = function(text) {
 	//console.log("first test: ", text);
 
 	text = text.replace(
-			/((WHERE .*)|(SET .*)|(VALUES .*)|(GROUP BY .*)|(FROM .*)|(DESC .*)|(ORDER BY .*))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim,
+			/((WHERE .*([\s\S]+)?)|(SET .*([\s\S]+)?)|(VALUES .*([\s\S]+)?)|(GROUP BY .*([\s\S]+)?)|(FROM .*([\s\S]+)?)|(DESC .*([\s\S]+)?)|(ORDER BY .*([\s\S]+)?))(?!.*\b\1\b)(?=(?:(?:[^"]*"){2})*[^"]*$)/gim,
 			''
 		);
+		
 	let separator = {
 		all: [],
 		OR: [],
@@ -431,7 +432,7 @@ module.exports.parse = function(text) {
 							items: {},
 							groups: []
 						};
-
+						
 						let SubParams = this.getAttributes(param);
 
 						let separator = SubParams.separator;
