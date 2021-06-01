@@ -1,7 +1,8 @@
 const utils = require('./query.js');
+const { checkUser } = require("./util.js");
 
 Date.prototype.yyyymmdd = function() {
-	var mm = this.getMonth() + 1; // getMonth() is zero-based
+	var mm = this.getMonth() + 1;
 	var dd = this.getDate();
 
 	return [
@@ -11,6 +12,7 @@ Date.prototype.yyyymmdd = function() {
 	].join('/');
 };
 
+
 function rejoin(array, separator) {
 	if (!array.length) return;
 
@@ -18,6 +20,7 @@ function rejoin(array, separator) {
 
 	array.forEach(item => {
 		newArr.push(item.join(separator));
+	 
 	});
 
 	return newArr;
@@ -25,6 +28,8 @@ function rejoin(array, separator) {
 
 module.exports.run = async (message, msg) => {
 	const isValid = utils.isValid(msg);
+  msg = msg.replace(/^\s+/g, "").replace(/\s+$/g, "");
+	
 	if (!isValid) {
 		message.channel.send('Invalid Query');
 		return;
@@ -32,9 +37,15 @@ module.exports.run = async (message, msg) => {
 
 	let data = await utils.parse(msg);
 	const guild = message.guild;
+  
+  let ordby = data.params.filter(v => v.type === "OrderBy")[0];
+  let isWhere = data.params.filter(v => v.type === "where")[0];
+  
+  if(isWhere && Array.isArray(isWhere.items)) return message.channel.send("Invalid query.");
+  
+  ordby = ordby ? ordby.items : ordby;
 
-
-   //console.log(JSON.stringify(data));
+   console.log(JSON.stringify(data));
  
 	try {
 		if (utils.isMention(data.target)) {
@@ -49,26 +60,27 @@ module.exports.run = async (message, msg) => {
 
 				data.params.forEach(async items => {
 					await new Promise(resolve => {
+						
 						if (items.type === 'info') {
 							let item = items.items;
 
 							for (let arg of item) {
 								if (arg === '*') {
-									resData.push(member.user.username);
+									resData.push((ordby ? (ordby["details"] === "true" ? "username: " : ""):"")+member.user.username);
 
-									resData.push(member.user.tag);
+									resData.push((ordby ? (ordby["details"] === "true" ? "tag: " : ""):"")+member.user.tag);
 
-									resData.push(member.nickname ? member.nickname : 'null');
+									resData.push((ordby ? (ordby["details"] === "true" ? "nickname: " : ""):"")+(member.nickname ? member.nickname : 'null'));
 
-									resData.push(member.user.id);
+									resData.push((ordby ? (ordby["details"] === "true" ? "id: " : ""):"")+member.user.id);
 
-									resData.push(member.user.displayAvatarURL());
+									resData.push((ordby ? (ordby["details"] === "true" ? "avatar: " : ""):"")+member.user.displayAvatarURL());
 
-									resData.push(member.user.discriminator);
+									resData.push((ordby ? (ordby["details"] === "true" ? "discriminator: " : ""):"")+member.user.discriminator);
 
-									resData.push(member.user.bot);
+									resData.push((ordby ? (ordby["details"] === "true" ? "isBot: " : ""):"")+member.user.bot);
 
-									resData.push(
+									resData.push((ordby ? (ordby["details"] === "true" ? "joinedDate: " : ""):"")+
 										member.joinedAt.yyyymmdd() +
 											' ' +
 											member.joinedAt.getUTCHours() +
@@ -78,7 +90,7 @@ module.exports.run = async (message, msg) => {
 											member.joinedAt.getUTCSeconds()
 									);
 
-									resData.push(
+									resData.push((ordby ? (ordby["details"] === "true" ? "createdDate: " : ""):"")+
 										member.user.createdAt.yyyymmdd() +
 											' ' +
 											member.user.createdAt.getUTCHours() +
@@ -96,21 +108,21 @@ module.exports.run = async (message, msg) => {
 									  	return role.name;
 									  });
 									  
-									  resData.push(roles.join(", "));
+									  resData.push((ordby ? (ordby["details"] === "true" ? "roles: " : ""):"")+roles.join(", "));
 									
 								} else if (arg === 'username')
-									resData.push(member.user.username);
-								else if (arg === 'tag') resData.push(member.user.tag);
+									resData.push((ordby ? (ordby["details"] === "true" ? arg+": " : ""):"")+member.user.username);
+								else if (arg === 'tag') resData.push((ordby ? (ordby["details"] === "true" ? arg+": " : ""):"")+member.user.tag);
 								else if (arg === 'nickname')
-									resData.push(member.nickname ? member.nickname : 'null');
-								else if (arg === 'id') resData.push(member.user.id);
+									resData.push((ordby ? (ordby["details"] === "true" ? arg+": " : ""):"")+member.nickname ? member.nickname : 'null');
+								else if (arg === 'id') resData.push((ordby ? (ordby["details"] === "true" ? arg+": " : ""):"")+member.user.id);
 								else if (arg === 'avatar')
-									resData.push(member.user.displayAvatarURL());
+									resData.push((ordby ? (ordby["details"] === "true" ? arg+": " : ""):"")+member.user.displayAvatarURL());
 								else if (arg === 'discriminator')
-									resData.push(member.user.discriminator);
-								else if (arg === 'isBot') resData.push(member.user.bot);
+									resData.push((ordby ? (ordby["details"] === "true" ? arg+": " : ""):"")+member.user.discriminator);
+								else if (arg === 'isBot') resData.push((ordby ? (ordby["details"] === "true" ? arg+": " : ""):"")+member.user.bot);
 								else if (arg === 'joinedDate')
-									resData.push(
+									resData.push((ordby ? (ordby["details"] === "true" ? arg+": " : ""):"")+
 										member.joinedAt.yyyymmdd() +
 											' ' +
 											member.joinedAt.getUTCHours() +
@@ -120,7 +132,7 @@ module.exports.run = async (message, msg) => {
 											member.joinedAt.getUTCSeconds()
 									);
 								else if (arg === 'createdDate')
-									resData.push(
+									resData.push((ordby ? (ordby["details"] === "true" ? arg+": " : ""):"")+
 										member.user.createdAt.yyyymmdd() +
 											' ' +
 											member.user.createdAt.getUTCHours() +
@@ -137,7 +149,7 @@ module.exports.run = async (message, msg) => {
 									  	return role.name;
 									  });
 									  
-									  resData.push(roles.join(", "));
+									  resData.push((ordby ? (ordby["details"] === "true" ? arg+": " : ""):"")+roles.join(", "));
 									}
 							}
 
@@ -228,381 +240,10 @@ module.exports.run = async (message, msg) => {
 							operator = operator ? operator[0] : '=';
 							i = i.replace(/(<|!|=|>)$/g, '');
 
-					//		console.log(i, /(role\.has( \([0-9]\))?)$/g.test(i));
+						//	console.log(i, /(role\.has( \([0-9]\))?)$/g.test(i));
 
-					   if(/(username( \([0-9]\))?)$/g.test(i)) {
-	
-								if(operator === "!"){
-								if (member.user.username !== arg) isUser.push(true);
-								else isUser.push(false);
-								}else{
-							if (member.user.username === arg) isUser.push(true);
-								else isUser.push(false);
-								}
-							} else if(/(username\.includes( \([0-9]\))?)$/g.test(i)) {
-								if(operator === "!"){
-								if (!member.user.username.includes(arg)) isUser.push(true);
-								else isUser.push(false);
-								}else{
-									if (member.user.username.includes(arg)) isUser.push(true);
-								else isUser.push(false);
-								}
-							} else if(/(username\.startsWith( \([0-9]\))?)$/g.test(i)) {
-								if(operator === "!"){
-								if (!member.user.username.startsWith(arg)) isUser.push(true);
-								else isUser.push(false);
-								}else{
-								if (member.user.username.startsWith(arg)) isUser.push(true);
-								else isUser.push(false);
-								}
-							} else if(/(username\.endsWith( \([0-9]\))?)$/g.test(i)) {
-								if(operator === "!"){
-								if (!member.user.username.endsWith(arg)) isUser.push(true);
-								else isUser.push(false);
-								}else{
-						if (member.user.username.endsWith(arg)) isUser.push(true);
-								else isUser.push(false);
-								}
-							} else if(/(isBot( \([0-9]\))?)$/g.test(i)) {
-								if(operator === "!"){
-								if (member.user.bot.toString() !== arg) isUser.push(true);
-								else isUser.push(false);
-								}else{
-						  	if (member.user.bot.toString() === arg) isUser.push(true);
-								else isUser.push(false);
-								}
-							} else if(/(avatar( \([0-9]\))?)$/g.test(i)) {
-								if(operator === "!"){
-								if (member.user.avatar !== arg) isUser.push(true);
-								else isUser.push(false);
-								}else{
-							if (member.user.avatar === arg) isUser.push(true);
-								else isUser.push(false);
-								}
-							} else if(/(avatar\.includes( \([0-9]\))?)$/g.test(i)) {
-								if(operator === "!"){
-								if (!member.user.avatar.includes(arg)) isUser.push(true);
-								else isUser.push(false);
-								}else{
-								if (member.user.avatar.includes(arg)) isUser.push(true);
-								else isUser.push(false);
-								}
-							} else if(/(avatar\.startsWith( \([0-9]\))?)$/g.test(i)) {
-								if(operator === "!"){
-								if (!member.user.avatar.startsWith(arg)) isUser.push(true);
-								else isUser.push(false);
-								}else{
-									if (member.user.avatar.startsWith(arg)) isUser.push(true);
-								else isUser.push(false);
-								}
-							} else if(/(avatar\.endsWith( \([0-9]\))?)$/g.test(i)) {
-								if(operator === "!"){
-								if (!member.user.avatar.endsWith(arg)) isUser.push(true);
-								else isUser.push(false);
-								}else{
-									if (member.user.avatar.endsWith(arg)) isUser.push(true);
-								else isUser.push(false);
-								}
-							} else if(/(nickname( \([0-9]\))?)$/g.test(i)) {
-								if(operator === "!"){
-								if (member.nickname !== arg) isUser.push(true);
-								else isUser.push(false);
-								}else{
-									if (member.nickname === arg) isUser.push(true);
-								else isUser.push(false);
-								}
-							} else if(/(nickname\.includes( \([0-9]\))?)$/g.test(i)) {
-								if(operator === "!"){
-								if (member.nickname && !member.nickname.includes(arg))
-									isUser.push(true);
-								else isUser.push(false);
-								}else{
-									if (member.nickname && member.nickname.includes(arg))
-									isUser.push(true);
-								else isUser.push(false);
-								}
-							} else if(/(nickname\.startsWith( \([0-9]\))?)$/g.test(i)) {
-								if(operator === "!"){
-								if (member.nickname && !member.nickname.startsWith(arg))
-									isUser.push(true);
-								else isUser.push(false);
-								}else{
-									if (member.nickname && member.nickname.startsWith(arg))
-									isUser.push(true);
-								else isUser.push(false);
-								}
-							} else if(/(nickname\.endsWith( \([0-9]\))?)$/g.test(i)){
-								if(operator === "!"){
-								if (member.nickname && !member.nickname.endsWith(arg))
-									isUser.push(true);
-								else isUser.push(false);
-								}else{
-									if (member.nickname && member.nickname.endsWith(arg))
-									isUser.push(true);
-								else isUser.push(false);
-								}
-							} else if(/(tag( \([0-9]\))?)$/g.test(i)){
-								if (member.user.tag === arg) isUser.push(true);
-								else isUser.push(false);
-							} else if(/(discriminator( \([0-9]\))?)$/g.test(i)) {
-								if(operator === "!"){
-								if (member.user.discriminator !== arg) isUser.push(true);
-								else isUser.push(false);
-								}else{
-									if (member.user.discriminator === arg) isUser.push(true);
-								else isUser.push(false);
-								}
-							} else if(/(discriminator\.includes( \([0-9]\))?)$/g.test(i)){
-								if(operator === "!"){
-								if (!member.user.discriminator.includes(arg)) isUser.push(true);
-								else isUser.push(false);
-								}else{
-									if (member.user.discriminator.includes(arg)) isUser.push(true);
-								else isUser.push(false);
-								}
-							} else if(/(discriminator\.startsWith( \([0-9]\))?)$/g.test(i)) {
-								if(operator === "!"){
-								if (!member.user.discriminator.startsWith(arg))
-									isUser.push(true);
-								else isUser.push(false);
-								}else{
-									if (member.user.discriminator.startsWith(arg))
-									isUser.push(true);
-								else isUser.push(false);
-								}
-							} else if(/(discriminator\.endsWith( \([0-9]\))?)$/g.test(i)) {
-								if(operator === "!"){
-								if (!member.user.discriminator.endsWith(arg)) isUser.push(true);
-								else isUser.push(false);
-								}else{
-									if (member.user.discriminator.endsWith(arg)) isUser.push(true);
-								else isUser.push(false);
-								}
-							} else if(/(id( \([0-9]\))?)$/g.test(i)){
-								if(operator === "!"){
-									if (member.user.id !== arg) isUser.push(true);
-							  	else isUser.push(false);
-								}else{
-								if (member.user.id === arg) isUser.push(true);
-								else isUser.push(false);
-								}
-							} else if(/(id\.includes( \([0-9]\))?)$/g.test(i)) {
-        	if(operator === "!"){
-        		if (!member.user.id.includes(arg)) isUser.push(true);
-								else isUser.push(false);
-        	}else{
-								if (member.user.id.includes(arg)) isUser.push(true);
-								else isUser.push(false);
-        	}
-							} else if(/(id\.startsWith( \([0-9]\))?)$/g.test(i)) {
-								if(operator === "!"){
-								if (!member.user.id.startsWith(arg)) isUser.push(true);
-								else isUser.push(false);
-								}else{
-						if (member.user.id.startsWith(arg)) isUser.push(true);
-								else isUser.push(false);
-								}
-							} else if(/(id\.endsWith( \([0-9]\))?)$/g.test(i)) {
-							if(operator === "!"){
-								if (!member.user.id.endsWith(arg)) isUser.push(true);
-								else isUser.push(false);
-							}else{
-								if (member.user.id.endsWith(arg)) isUser.push(true);
-								else isUser.push(false);
-							}
-							} else if(/(joinedDate\.hours( \([0-9]\))?)$/g.test(i)){
-								if (isNaN(arg)) {
-									isUser.push(false);
-									return;
-								}
-
-								if (operator === '<') {
-									if (
-										Date.now() - member.joinedAt <=
-										1000 * 60 * 60 * 28 * Number(arg)
-									)
-										isUser.push(true);
-									else isUser.push(false);
-								} else if (operator === '>') {
-									if (
-										Date.now() - member.joinedAt >=
-										1000 * 60 * 60 * 28 * Number(arg)
-									)
-										isUser.push(true);
-									else isUser.push(false);
-								} else {
-									if (
-										Date.now() - member.joinedAt ===
-										1000 * 60 * 60 * 28 * Number(arg)
-									)
-										isUser.push(true);
-									else isUser.push(false);
-								}
-							} else if(/(joinedDate\.months( \([0-9]\))?)$/g.test(i)){
-								if (isNaN(arg)) {
-									isUser.push(false);
-									return;
-								}
-
-								if (operator === '<') {
-									if (
-										Date.now() - member.joinedAt <=
-										1000 * 60 * 60 * 24 * 28 * Number(arg)
-									)
-										isUser.push(true);
-									else isUser.push(false);
-								} else if (operator === '>') {
-									if (
-										Date.now() - member.joinedAt >=
-										1000 * 60 * 60 * 24 * 28 * Number(arg)
-									)
-										isUser.push(true);
-									else isUser.push(false);
-								} else {
-									if (
-										Date.now() - member.joinedAt ===
-										1000 * 60 * 60 * 24 * 28 * Number(arg)
-									)
-										isUser.push(true);
-									else isUser.push(false);
-								}
-							} else if(/(joinedDate\.days( \([0-9]\))?)$/g.test(i)){
-								if (isNaN(arg)) {
-									isUser.push(false);
-									return;
-								}
-
-								if (operator === '<') {
-									if (
-										Date.now() - member.joinedAt <=
-										1000 * 60 * 60 * 24 * Number(arg)
-									)
-										isUser.push(true);
-									else isUser.push(false);
-								} else if (operator === '>') {
-									if (
-										Date.now() - member.joinedAt >=
-										1000 * 60 * 60 * 24 * Number(arg)
-									)
-										isUser.push(true);
-									else isUser.push(false);
-								} else {
-									if (
-										Date.now() - member.joinedAt ===
-										1000 * 60 * 60 * 24 * Number(arg)
-									)
-										isUser.push(true);
-									else isUser.push(false);
-								}
-							} else if(/(createdDate\.days( \([0-9]\))?)$/g.test(i)) {
-								if (isNaN(arg)) {
-									isUser.push(false);
-									return;
-								}
-
-								if (operator === '<') {
-									if (
-										Date.now() - member.user.createdAt <=
-										1000 * 60 * 60 * 24 * Number(arg)
-									)
-										isUser.push(true);
-									else isUser.push(false);
-								} else if (operator === '>') {
-									if (
-										Date.now() - member.user.createdAt >=
-										1000 * 60 * 60 * 24 * Number(arg)
-									)
-										isUser.push(true);
-									else isUser.push(false);
-								} else {
-									if (
-										Date.now() - member.user.createdAt ===
-										1000 * 60 * 60 * 24 * Number(arg)
-									)
-										isUser.push(true);
-									else isUser.push(false);
-								}
-							} else if(/(createdDate\.hours( \([0-9]\))?)$/g.test(i)){
-								if (isNaN(arg)) {
-									isUser.push(false);
-									return;
-								}
-
-								if (operator === '<') {
-									if (
-										Date.now() - member.user.createdAt <=
-										1000 * 60 * 60 * 28 * Number(arg)
-									)
-										isUser.push(true);
-									else isUser.push(false);
-								} else if (operator === '>') {
-									if (
-										Date.now() - member.user.createdAt >=
-										1000 * 60 * 60 * 28 * Number(arg)
-									)
-										isUser.push(true);
-									else isUser.push(false);
-								} else {
-									if (
-										Date.now() - member.user.createdAt ===
-										1000 * 60 * 60 * 28 * Number(arg)
-									)
-										isUser.push(true);
-									else isUser.push(false);
-								}
-							} else if(/(createdDate\.months( \([0-9]\))?)$/g.test(i)){
-								if (isNaN(arg)) {
-									isUser.push(false);
-									return;
-								}
-
-								if (operator === '<') {
-									if (
-										Date.now() - member.user.createdAt <=
-										1000 * 60 * 60 * 28 * 24 * Number(arg)
-									)
-										isUser.push(true);
-									else isUser.push(false);
-								} else if (operator === '>') {
-									if (
-										Date.now() - member.user.createdAt >=
-										1000 * 60 * 60 * 28 * 24 * Number(arg)
-									)
-										isUser.push(true);
-									else isUser.push(false);
-								} else {
-									if (
-										Date.now() - member.user.createdAt ===
-										1000 * 60 * 28 * 60 * 24 * Number(arg)
-									)
-										isUser.push(true);
-									else isUser.push(false);
-								}
-							}else if(/(role\.has( \([0-9]\))?)$/g.test(i)){
-								let role;
-								
-								if(!isNaN(arg))
-								role = message.guild.roles.cache.get(arg);
-								else
-                role = message.guild.roles.cache.find(r => r.name === arg);
-                
-                
-						    if(!role){
-						    	isUser.push(false);
-						    	return;
-						    }
-						    
-						    if(operator === "!"){
-						    	if(!member._roles.includes(role.id))
-						    isUser.push(true);
-								else isUser.push(false);
-						    }else{
-						    if(member._roles.includes(role.id))
-						    isUser.push(true);
-								else isUser.push(false);
-						    }
-								
-							}
+					    isUser = checkUser(message, isUser, member, operator, arg, i);
+				      
 						}
 
 						let can = utils.condition(where.separator.all, isUser);
@@ -626,40 +267,41 @@ module.exports.run = async (message, msg) => {
 
 									for (let arg of item) {
 										if (arg === '*') {
-											resData.push(member.user.username);
+											resData.push((ordby ? (ordby["details"] === "true" ? "username: " : ""):"")+member.user.username);
 
-											resData.push(member.user.tag);
+									resData.push((ordby ? (ordby["details"] === "true" ? "tag: " : ""):"")+member.user.tag);
 
-											resData.push(member.nickname ? member.nickname : 'null');
+									resData.push((ordby ? (ordby["details"] === "true" ? "nickname: " : ""):"")+(member.nickname ? member.nickname : 'null'));
 
-											resData.push(member.user.id);
+									resData.push((ordby ? (ordby["details"] === "true" ? "id: " : ""):"")+member.user.id);
 
-											resData.push(member.user.displayAvatarURL());
+									resData.push((ordby ? (ordby["details"] === "true" ? "avatar: " : ""):"")+member.user.displayAvatarURL());
 
-											resData.push(member.user.discriminator);
+									resData.push((ordby ? (ordby["details"] === "true" ? "discriminator: " : ""):"")+member.user.discriminator);
 
-											resData.push(member.user.bot);
+									resData.push((ordby ? (ordby["details"] === "true" ? "isBot: " : ""):"")+member.user.bot);
 
-											resData.push(
-												member.joinedAt.yyyymmdd() +
-													' ' +
-													member.joinedAt.getUTCHours() +
-													':' +
-													member.joinedAt.getUTCMinutes() +
-													':' +
-													member.joinedAt.getUTCSeconds()
-											);
+									resData.push((ordby ? (ordby["details"] === "true" ? "joinedDate: " : ""):"")+
+										member.joinedAt.yyyymmdd() +
+											' ' +
+											member.joinedAt.getUTCHours() +
+											':' +
+											member.joinedAt.getUTCMinutes() +
+											':' +
+											member.joinedAt.getUTCSeconds()
+									);
 
-											resData.push(
-												member.user.createdAt.yyyymmdd() +
-													' ' +
-													member.user.createdAt.getUTCHours() +
-													':' +
-													member.user.createdAt.getUTCMinutes() +
-													':' +
-													member.user.createdAt.getUTCSeconds()
-											);
-											
+									resData.push((ordby ? (ordby["details"] === "true" ? "createdDate: " : ""):"")+
+										member.user.createdAt.yyyymmdd() +
+											' ' +
+											member.user.createdAt.getUTCHours() +
+											':' +
+											member.user.createdAt.getUTCMinutes() +
+											':' +
+											member.user.createdAt.getUTCSeconds()
+									);
+									
+									
 									  let roles = member._roles;
 									  
 									  roles = roles.map(r =>{
@@ -667,21 +309,21 @@ module.exports.run = async (message, msg) => {
 									  	return role.name;
 									  });
 									  
-									  resData.push(roles.join(", "));
+									  resData.push((ordby ? (ordby["details"] === "true" ? "roles: " : ""):"")+roles.join(", "));
 									
 										} else if (arg === 'username')
-											resData.push(member.user.username);
-										else if (arg === 'tag') resData.push(member.user.tag);
+											resData.push((ordby ? (ordby["details"] === "true" ? arg+": " : ""):"")+member.user.username);
+										else if (arg === 'tag') resData.push((ordby ? (ordby["details"] === "true" ? arg+": " : ""):"")+member.user.tag);
 										else if (arg === 'nickname')
-											resData.push(member.nickname ? member.nickname : 'null');
-										else if (arg === 'id') resData.push(member.user.id);
+											resData.push((ordby ? (ordby["details"] === "true" ? arg+": " : ""):"")+member.nickname ? member.nickname : 'null');
+										else if (arg === 'id') resData.push((ordby ? (ordby["details"] === "true" ? arg+": " : ""):"")+member.user.id);
 										else if (arg === 'avatar')
-											resData.push(member.user.displayAvatarURL());
+											resData.push((ordby ? (ordby["details"] === "true" ? arg+": " : ""):"")+member.user.displayAvatarURL());
 										else if (arg === 'discriminator')
-											resData.push(member.user.discriminator);
-										else if (arg === 'isBot') resData.push(member.user.bot);
+											resData.push((ordby ? (ordby["details"] === "true" ? arg+": " : ""):"")+member.user.discriminator);
+										else if (arg === 'isBot') resData.push((ordby ? (ordby["details"] === "true" ? arg+": " : ""):"")+member.user.bot);
 										else if (arg === 'joinedDate')
-											resData.push(
+											resData.push((ordby ? (ordby["details"] === "true" ? arg+": " : ""):"")+
 												member.joinedAt.yyyymmdd() +
 													' ' +
 													member.joinedAt.getUTCHours() +
@@ -691,7 +333,7 @@ module.exports.run = async (message, msg) => {
 													member.joinedAt.getUTCSeconds()
 											);
 										else if (arg === 'createdDate')
-											resData.push(
+											resData.push((ordby ? (ordby["details"] === "true" ? arg+": " : ""):"")+
 												member.user.createdAt.yyyymmdd() +
 													' ' +
 													member.user.createdAt.getUTCHours() +
@@ -708,7 +350,7 @@ module.exports.run = async (message, msg) => {
 									  	return role.name;
 									  });
 									  
-									  resData.push(roles.join(", "));
+									  resData.push((ordby ? (ordby["details"] === "true" ? arg+": " : ""):"")+roles.join(", "));
 									}
 									}
 									membersFiltered.push(resData);
@@ -737,14 +379,16 @@ module.exports.run = async (message, msg) => {
 						resolver();
 					});
 				});
-
+				
 				let compress = rejoin(membersFiltered, separator);
-
+		   
 				if (count) compress = compress.slice(0, count);
-
+				
+				try{
 				if (membersFiltered.length > 0)
-					message.channel.send(compress.join(line));
+					message.channel.send(compress.join(line), {split:true});
 				else message.channel.send('Please specify.');
+				}catch{message.channel.send("the length of the message is too much")};
 				
 				
 				}else if(data.method.toLowerCase() === "update"){
@@ -773,40 +417,41 @@ module.exports.run = async (message, msg) => {
 
 								for (let arg of item) {
 									if (arg === '*') {
-										resData.push(member.user.username);
+										resData.push((ordby ? (ordby["details"] === "true" ? "username: " : ""):"")+member.user.username);
 
-										resData.push(member.user.tag);
+									resData.push((ordby ? (ordby["details"] === "true" ? "tag: " : ""):"")+member.user.tag);
 
-										resData.push(member.nickname ? member.nickname : 'null');
+									resData.push((ordby ? (ordby["details"] === "true" ? "nickname: " : ""):"")+(member.nickname ? member.nickname : 'null'));
 
-										resData.push(member.user.id);
+									resData.push((ordby ? (ordby["details"] === "true" ? "id: " : ""):"")+member.user.id);
 
-										resData.push(member.user.displayAvatarURL());
+									resData.push((ordby ? (ordby["details"] === "true" ? "avatar: " : ""):"")+member.user.displayAvatarURL());
 
-										resData.push(member.user.discriminator);
+									resData.push((ordby ? (ordby["details"] === "true" ? "discriminator: " : ""):"")+member.user.discriminator);
 
-										resData.push(member.user.bot);
+									resData.push((ordby ? (ordby["details"] === "true" ? "isBot: " : ""):"")+member.user.bot);
 
-										resData.push(
-											member.joinedAt.yyyymmdd() +
-												' ' +
-												member.joinedAt.getUTCHours() +
-												':' +
-												member.joinedAt.getUTCMinutes() +
-												':' +
-												member.joinedAt.getUTCSeconds()
-										);
+									resData.push((ordby ? (ordby["details"] === "true" ? "joinedDate: " : ""):"")+
+										member.joinedAt.yyyymmdd() +
+											' ' +
+											member.joinedAt.getUTCHours() +
+											':' +
+											member.joinedAt.getUTCMinutes() +
+											':' +
+											member.joinedAt.getUTCSeconds()
+									);
 
-										resData.push(
-											member.user.createdAt.yyyymmdd() +
-												' ' +
-												member.user.createdAt.getUTCHours() +
-												':' +
-												member.user.createdAt.getUTCMinutes() +
-												':' +
-												member.user.createdAt.getUTCSeconds()
-										);
-										
+									resData.push((ordby ? (ordby["details"] === "true" ? "createdDate: " : ""):"")+
+										member.user.createdAt.yyyymmdd() +
+											' ' +
+											member.user.createdAt.getUTCHours() +
+											':' +
+											member.user.createdAt.getUTCMinutes() +
+											':' +
+											member.user.createdAt.getUTCSeconds()
+									);
+									
+									
 									  let roles = member._roles;
 									  
 									  roles = roles.map(r =>{
@@ -814,21 +459,21 @@ module.exports.run = async (message, msg) => {
 									  	return role.name;
 									  });
 									  
-									  resData.push(roles.join(", "));
+									  resData.push((ordby ? (ordby["details"] === "true" ? "roles: " : ""):"")+roles.join(", "));
 									
 									} else if (arg === 'username')
-										resData.push(member.user.username);
-									else if (arg === 'tag') resData.push(member.user.tag);
+										resData.push((ordby ? (ordby["details"] === "true" ? arg+": " : ""):"")+member.user.username);
+									else if (arg === 'tag') resData.push((ordby ? (ordby["details"] === "true" ? arg+": " : ""):"")+member.user.tag);
 									else if (arg === 'nickname')
-										resData.push(member.nickname ? member.nickname : 'null');
-									else if (arg === 'id') resData.push(member.user.id);
+										resData.push((ordby ? (ordby["details"] === "true" ? arg+": " : ""):"")+member.nickname ? member.nickname : 'null');
+									else if (arg === 'id') resData.push((ordby ? (ordby["details"] === "true" ? arg+": " : ""):"")+member.user.id);
 									else if (arg === 'avatar')
-										resData.push(member.user.displayAvatarURL());
+										resData.push((ordby ? (ordby["details"] === "true" ? arg+": " : ""):"")+member.user.displayAvatarURL());
 									else if (arg === 'discriminator')
-										resData.push(member.user.discriminator);
-									else if (arg === 'isBot') resData.push(member.user.bot);
+										resData.push((ordby ? (ordby["details"] === "true" ? arg+": " : ""):"")+member.user.discriminator);
+									else if (arg === 'isBot') resData.push((ordby ? (ordby["details"] === "true" ? arg+": " : ""):"")+member.user.bot);
 									else if (arg === 'joinedDate')
-										resData.push(
+										resData.push((ordby ? (ordby["details"] === "true" ? arg+": " : ""):"")+
 											member.joinedAt.yyyymmdd() +
 												' ' +
 												member.joinedAt.getUTCHours() +
@@ -838,7 +483,7 @@ module.exports.run = async (message, msg) => {
 												member.joinedAt.getUTCSeconds()
 										);
 									else if (arg === 'createdDate')
-										resData.push(
+										resData.push((ordby ? (ordby["details"] === "true" ? arg+": " : ""):"")+
 											member.user.createdAt.yyyymmdd() +
 												' ' +
 												member.user.createdAt.getUTCHours() +
@@ -855,7 +500,7 @@ module.exports.run = async (message, msg) => {
 									  	return role.name;
 									  });
 									  
-									  resData.push(roles.join(", "));
+									  resData.push((ordby ? (ordby["details"] === "true" ? arg+": " : ""):"")+roles.join(", "));
 									}
 								}
 
