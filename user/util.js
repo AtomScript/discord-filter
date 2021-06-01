@@ -1,5 +1,6 @@
 
 module.exports.checkUser = function(message, isUser, member, operator,  arg, i){
+	isUser = isUser ? isUser : [];
 	
 	if(/(username( \([0-9]\))?)$/g.test(i)) {
 	
@@ -184,7 +185,7 @@ module.exports.checkUser = function(message, isUser, member, operator,  arg, i){
 							} else if(/(joinedDate\.hours( \([0-9]\))?)$/g.test(i)){
 								if (isNaN(arg)) {
 									isUser.push(false);
-									return;
+									return isUser;
 								}
 
 								if (operator === '<') {
@@ -212,7 +213,7 @@ module.exports.checkUser = function(message, isUser, member, operator,  arg, i){
 							} else if(/(joinedDate\.months( \([0-9]\))?)$/g.test(i)){
 								if (isNaN(arg)) {
 									isUser.push(false);
-									return;
+									return isUser;
 								}
 
 								if (operator === '<') {
@@ -240,7 +241,7 @@ module.exports.checkUser = function(message, isUser, member, operator,  arg, i){
 							} else if(/(joinedDate\.days( \([0-9]\))?)$/g.test(i)){
 								if (isNaN(arg)) {
 									isUser.push(false);
-									return;
+									return isUser;
 								}
 
 								if (operator === '<') {
@@ -268,7 +269,7 @@ module.exports.checkUser = function(message, isUser, member, operator,  arg, i){
 							} else if(/(createdDate\.days( \([0-9]\))?)$/g.test(i)) {
 								if (isNaN(arg)) {
 									isUser.push(false);
-									return;
+									return isUser;
 								}
 
 								if (operator === '<') {
@@ -296,7 +297,7 @@ module.exports.checkUser = function(message, isUser, member, operator,  arg, i){
 							} else if(/(createdDate\.hours( \([0-9]\))?)$/g.test(i)){
 								if (isNaN(arg)) {
 									isUser.push(false);
-									return;
+									return isUser;
 								}
 
 								if (operator === '<') {
@@ -324,7 +325,7 @@ module.exports.checkUser = function(message, isUser, member, operator,  arg, i){
 							} else if(/(createdDate\.months( \([0-9]\))?)$/g.test(i)){
 								if (isNaN(arg)) {
 									isUser.push(false);
-									return;
+									return isUser;
 								}
 
 								if (operator === '<') {
@@ -360,7 +361,7 @@ module.exports.checkUser = function(message, isUser, member, operator,  arg, i){
                 
 						    if(!role){
 						    	isUser.push(false);
-						    	return;
+						      return isUser;
 						    }
 						    
 						    if(operator === "!"){
@@ -373,6 +374,6 @@ module.exports.checkUser = function(message, isUser, member, operator,  arg, i){
 								else isUser.push(false);
 						    }
 							}
-								
+						
 								return isUser;
 }
